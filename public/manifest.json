@@ -1,0 +1,15 @@
+{
+  "name": "Roopesh OS",
+  "short_name": "RoopeshOS",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0078d7",
+  "icons": [
+    {
+      "src": "/assets/icons/folder.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
