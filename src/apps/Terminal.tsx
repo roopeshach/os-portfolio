@@ -82,8 +82,19 @@ const TerminalApp: React.FC = () => {
       
       try {
         switch (c) {
+          case 'neofetch':
+            term.writeln(`
+       \x1b[36m/\\      \x1b[0m\x1b[1;37mOS:\x1b[0m RoopeshOS x86_64
+      \x1b[36m/  \\     \x1b[0m\x1b[1;37mHost:\x1b[0m Web Browser
+     \x1b[36m/ /\\ \\    \x1b[0m\x1b[1;37mKernel:\x1b[0m React 18.2.0
+    \x1b[36m/ /  \\ \\   \x1b[0m\x1b[1;37mUptime:\x1b[0m ${(performance.now() / 60000).toFixed(2)} mins
+   \x1b[36m/ /    \\ \\  \x1b[0m\x1b[1;37mResolution:\x1b[0m ${window.screen.width}x${window.screen.height}
+  \x1b[36m/ /      \\ \\ \x1b[0m\x1b[1;37mShell:\x1b[0m ZSH (Simulated)
+ \x1b[36m/_/        \\_\\\x1b[0m\x1b[1;37mTheme:\x1b[0m Cyberpunk Neon
+`);
+            break;
           case 'help':
-            term.writeln('Available commands: help, clear, echo, ls, cd, pwd, mkdir, touch, rm, cat, whoami, github, contact');
+            term.writeln('Available commands: help, clear, echo, ls, cd, pwd, mkdir, touch, rm, cat, neofetch, whoami, github, contact');
             break;
           case 'clear':
           case 'cls':
