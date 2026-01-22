@@ -8,6 +8,7 @@ const FileExplorer = React.lazy(() => import('../apps/FileExplorer'));
 const MediaPlayer = React.lazy(() => import('../apps/MediaPlayer'));
 const Browser = React.lazy(() => import('../apps/Browser'));
 const CodeEditor = React.lazy(() => import('../apps/CodeEditor'));
+const Performance = React.lazy(() => import('../apps/Performance'));
 
 export const AppRegistry: Record<string, React.ComponentType<any>> = {
   'Notepad': Notepad,
@@ -17,6 +18,7 @@ export const AppRegistry: Record<string, React.ComponentType<any>> = {
   'Media Player': MediaPlayer,
   'Browser': Browser,
   'VS Code': CodeEditor,
+  'Performance': Performance,
 };
 
 export const AppMetadata = {
