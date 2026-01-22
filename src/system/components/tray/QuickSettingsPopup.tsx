@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Wifi, Volume2, Battery, Bluetooth, Sun, Monitor, Cpu } from 'lucide-react';
+import { Wifi, Volume2, Battery, Sun, Monitor, Cpu } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '../../../store';
+import { setVolume, setBrightness } from '../../../store/settingsSlice';
+import { openProcess } from '../../../store/processSlice';
 
 const PopupContainer = styled.div`
   position: absolute;
@@ -98,6 +102,19 @@ const ConnectionInfo = styled.div`
 `;
 
 const QuickSettingsPopup: React.FC = () => {
+  const dispatch = useDispatch();
+  const volume = useSelector((state: RootState) => state.settings.volume);
+  const brightness = useSelector((state: RootState) => state.settings.brightness);
+
+  const handlePerformance = () => {
+    dispatch(openProcess({
+      appId: 'Performance',
+      title: 'Performance Monitor',
+      icon: '/assets/icons/task-manager.svg', // Will need to add this
+      componentName: 'Performance',
+    }));
+  };
+
   return (
     <PopupContainer>
       <div>
@@ -107,15 +124,12 @@ const QuickSettingsPopup: React.FC = () => {
             <Wifi size={20} color="#00d8ff" />
             <TileLabel>CyberNet_5G</TileLabel>
           </Tile>
-          <Tile>
-            <Bluetooth size={20} />
-            <TileLabel>Bluetooth</TileLabel>
-          </Tile>
+          {/* Removed Bluetooth as requested */}
           <Tile>
             <Monitor size={20} />
             <TileLabel>Project</TileLabel>
           </Tile>
-          <Tile>
+          <Tile onClick={handlePerformance}>
             <Cpu size={20} />
             <TileLabel>Performance</TileLabel>
           </Tile>
@@ -132,11 +146,23 @@ const QuickSettingsPopup: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <SliderRow>
             <Volume2 size={16} />
-            <Slider type="range" defaultValue={70} />
+            <Slider 
+              type="range" 
+              min={0} 
+              max={100} 
+              value={volume} 
+              onChange={(e) => dispatch(setVolume(Number(e.target.value)))} 
+            />
           </SliderRow>
           <SliderRow>
             <Sun size={16} />
-            <Slider type="range" defaultValue={90} />
+            <Slider 
+              type="range" 
+              min={10} 
+              max={100} 
+              value={brightness} 
+              onChange={(e) => dispatch(setBrightness(Number(e.target.value)))} 
+            />
           </SliderRow>
         </div>
       </div>

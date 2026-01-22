@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface SettingsState {
+export interface SettingsState {
   theme: 'light' | 'dark';
-  wallpaper: string; // URL or path
+  wallpaper: string;
   volume: number;
   brightness: number;
+  soundEnabled: boolean;
 }
 
 const initialState: SettingsState = {
@@ -12,6 +13,7 @@ const initialState: SettingsState = {
   wallpaper: '/assets/wallpapers/cyberpunk.svg',
   volume: 50,
   brightness: 100,
+  soundEnabled: true,
 };
 
 const settingsSlice = createSlice({
@@ -27,11 +29,14 @@ const settingsSlice = createSlice({
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
     },
-    toggleTheme: (state) => {
-      state.theme = state.theme === 'light' ? 'dark' : 'light';
+    setBrightness: (state, action: PayloadAction<number>) => {
+      state.brightness = action.payload;
+    },
+    toggleSound: (state) => {
+      state.soundEnabled = !state.soundEnabled;
     },
   },
 });
 
-export const { setTheme, setWallpaper, setVolume, toggleTheme } = settingsSlice.actions;
+export const { setTheme, setWallpaper, setVolume, setBrightness, toggleSound } = settingsSlice.actions;
 export default settingsSlice.reducer;
