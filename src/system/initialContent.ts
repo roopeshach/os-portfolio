@@ -1,74 +1,22 @@
-import { mkdir, writeFile, exists } from './FileSystem';
+import { mkdir, writeFile } from './FileSystem';
 
-const bio = `
-Roopesh Acharya
-Software Engineer specializing in building scalable web applications with deep engagement in Artificial Intelligence (AI) and Machine Learning (ML).
+const bio = `Hi, I'm Roopesh.
+I am a Full Stack Developer passionate about building interactive web experiences.`;
 
-Professional Summary:
-Roopesh Acharya is a versatile and passionate Software Engineer with expertise in full-stack development, AI/ML integration, and automation solutions. With a proven track record of building scalable, efficient, and secure applications, he brings a diverse skill set that bridges theoretical knowledge and real-world application.
+const skills = `Frontend:
+- React, Vue, Angular
+- TypeScript, JavaScript
+- Styled Components, Tailwind CSS
 
-Location: Nepal
-LinkedIn: https://www.linkedin.com/in/rupeshach/
-GitHub: https://github.com/roopeshach
-Website: https://roopeshachrya.com.np
-`;
-
-const skills = `
-Programming Languages:
-- Python (Backend, AI/ML)
-- JavaScript/TypeScript (Full Stack)
-- PHP (Backend)
-- Dart (Mobile)
-- HTML5 & CSS3
-- C#
-
-AI/ML Technologies:
-- TensorFlow, Keras, scikit-learn
-- Computer Vision, Predictive Modeling
-
-Web Frameworks:
-- Django, Flask, FastAPI
-- React, Next.js, Vue.js
-- Node.js
-
-DevOps & Infrastructure:
-- Docker, Kubernetes
-- CI/CD (GitHub Actions)
-- Linux
-`;
-
-const projects = [
-  {
-    name: "Django Application Builder",
-    desc: "Automation tool that streamlines Django application development with auth and API generation.",
-    tech: "Python, Django, DRF",
-  },
-  {
-    name: "Enterprise Backend Infrastructure",
-    desc: "Full-scale backend system powering enterprise management solutions.",
-    tech: "TypeScript, Node.js, PostgreSQL",
-  },
-  {
-    name: "AI-Powered Security Extension",
-    desc: "Intelligent phishing detection system protecting users in real-time.",
-    tech: "Python, JS, ML",
-  },
-  {
-    name: "Handwritten Digit Recognition",
-    desc: "Advanced ML project for image classification using CNNs.",
-    tech: "Python, TensorFlow",
-  },
-  {
-    name: "Chess Engine Prototype",
-    desc: "Core chess game mechanics implementation.",
-    tech: "Algorithm Design",
-  },
-];
+Backend:
+- Node.js, Express
+- Python, Django
+- PostgreSQL, MongoDB`;
 
 export const initializeContent = async () => {
   try {
-    const rootExists = await exists('/Users');
-    if (rootExists) {
+    // Check if initialized
+    if (localStorage.getItem('fs_initialized')) {
       console.log('Filesystem already populated.');
       return;
     }
@@ -87,40 +35,44 @@ export const initializeContent = async () => {
     await writeFile('/Users/Roopesh/Documents/Bio.txt', bio);
     await writeFile('/Users/Roopesh/Documents/Skills.txt', skills);
     
-    // Projects
-    for (const proj of projects) {
-      const content = `# ${proj.name}
+    // Projects (New format)
+    const projects = [
+      {
+        name: 'PortfolioOS',
+        title: 'Portfolio OS',
+        tagline: 'A Web-based Operating System Experience',
+        tags: ['React', 'TypeScript', 'Redux', 'Styled Components'],
+        description: 'A fully functional desktop environment running in the browser. Features a virtual file system, window management, and terminal emulation.',
+        features: ['Window Management', 'Virtual File System', 'Terminal with Commands', 'Theme System'],
+        stats: [
+          { label: 'Lines of Code', value: '5,000+' },
+          { label: 'Components', value: '40+' },
+          { label: 'Performance', value: '60 FPS' }
+        ]
+      },
+      {
+        name: 'E-Commerce',
+        title: 'Neon Shop',
+        tagline: 'Next-Gen Shopping Experience',
+        tags: ['Next.js', 'Stripe', 'Tailwind'],
+        description: 'A modern e-commerce platform with real-time inventory and secure payments.',
+        features: ['Real-time Cart', 'Stripe Integration', 'Admin Dashboard'],
+        stats: [
+          { label: 'Products', value: '1,000+' },
+          { label: 'Transactions', value: '500/day' },
+          { label: 'Uptime', value: '99.9%' }
+        ]
+      }
+    ];
 
-**Tech Stack:** ${proj.tech}
-
-## Description
-${proj.desc}
-
-## Features
-- Scalable architecture
-- Modern UI/UX
-- Performance optimized
-`;
-      await writeFile(`/Users/Roopesh/Projects/${proj.name}.md`, content);
-    }
-
-    // Desktop Shortcuts (files for now)
-    await writeFile('/Users/Roopesh/Desktop/ReadMe.md', "# Welcome to Roopesh's Portfolio OS!\n\nDouble click icons to open apps.\nRight click to create files.");
-    await writeFile('/Users/Roopesh/Desktop/Resume.link', "https://www.linkedin.com/in/rupeshach/");
-    await writeFile('/Users/Roopesh/Desktop/Bio.txt', bio);
-    await writeFile('/Users/Roopesh/Desktop/Skills.txt', skills);
-    
-    // Create Projects folder on Desktop for easy access
     await mkdir('/Users/Roopesh/Desktop/Projects');
+    
     for (const proj of projects) {
-      const content = `# ${proj.name}
-
-**Tech Stack:** ${proj.tech}
-
-## Description
-${proj.desc}
-`;
-      await writeFile(`/Users/Roopesh/Desktop/Projects/${proj.name}.md`, content);
+      // Save as .project JSON
+      await writeFile(
+        `/Users/Roopesh/Desktop/Projects/${proj.name}.project`, 
+        JSON.stringify(proj, null, 2)
+      );
     }
 
     console.log('Filesystem population complete.');

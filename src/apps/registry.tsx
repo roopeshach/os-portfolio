@@ -10,6 +10,7 @@ const Browser = React.lazy(() => import('../apps/Browser'));
 const CodeEditor = React.lazy(() => import('../apps/CodeEditor'));
 const Performance = React.lazy(() => import('../apps/Performance'));
 const JSConsole = React.lazy(() => import('../apps/JSConsole'));
+const ProjectViewer = React.lazy(() => import('../apps/ProjectViewer'));
 
 export const AppRegistry: Record<string, React.ComponentType<any>> = {
   'Notepad': Notepad,
@@ -21,6 +22,7 @@ export const AppRegistry: Record<string, React.ComponentType<any>> = {
   'VS Code': CodeEditor,
   'Performance': Performance,
   'JS Console': JSConsole,
+  'Project Viewer': ProjectViewer,
 };
 
 export const AppMetadata = {
@@ -31,5 +33,6 @@ export const AppMetadata = {
   'Calculator': { title: 'Calculator', icon: '/assets/icons/calculator.svg' },
   'Terminal': { title: 'Terminal', icon: '/assets/icons/terminal.svg' },
   'Media Player': { title: 'Media Player', icon: '/assets/icons/media-player.svg' },
-  'JS Console': { title: 'JS Console', icon: '/assets/icons/terminal.svg' }, // Reusing terminal icon for now
+  'JS Console': { title: 'JS Console', icon: '/assets/icons/terminal.svg' },
+  'Project Viewer': { title: 'Project', icon: '/assets/icons/folder.svg' },
 };

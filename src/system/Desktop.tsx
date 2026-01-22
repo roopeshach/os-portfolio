@@ -109,6 +109,14 @@ const Desktop: React.FC = () => {
                  }));
                }
             });
+          } else if (filename.endsWith('.project')) {
+            dispatch(openProcess({
+              appId: 'Project Viewer',
+              title: filename.replace('.project', ''),
+              icon: '/assets/icons/folder.svg',
+              componentName: 'Project Viewer',
+              initialProps: { path: fullPath }
+            }));
           } else if (['.txt', '.md', '.json', '.ts', '.js'].includes(ext)) {
             dispatch(openProcess({
               appId: 'Notepad',
