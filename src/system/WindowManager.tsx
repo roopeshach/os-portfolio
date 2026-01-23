@@ -6,6 +6,7 @@ import { AppRegistry } from '../apps/registry';
 
 const WindowManager: React.FC = () => {
   const processes = useSelector((state: RootState) => state.process.processes);
+  const activeId = useSelector((state: RootState) => state.process.activeId);
 
   return (
     <>
@@ -21,7 +22,7 @@ const WindowManager: React.FC = () => {
             icon={process.icon}
           >
             <Suspense fallback={<div>Loading...</div>}>
-              <AppComponent {...process.initialProps} />
+              <AppComponent {...process.initialProps} isActive={process.id === activeId} />
             </Suspense>
           </WindowFrame>
         );

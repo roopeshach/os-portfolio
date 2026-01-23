@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { readdir, fs, path as pathModule } from '../system/FileSystem';
-import { Folder, FileText, ArrowLeft } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
+import { showAlert } from '../store/systemSlice';
+import { 
+  Folder, FileText, ArrowLeft
+} from 'lucide-react';
 
 const ExplorerContainer = styled.div`
   display: flex;
@@ -63,17 +66,16 @@ const FileExplorer: React.FC = () => {
   const [files, setFiles] = useState<string[]>([]);
   const dispatch = useDispatch();
 
-  const loadFiles = async (path: string) => {
-    try {
-      const fileList = await readdir(path);
-      setFiles(fileList);
-    } catch (e) {
-      console.error(e);
-      setFiles([]);
-    }
-  };
-
   useEffect(() => {
+    const loadFiles = async (path: string) => {
+      try {
+        const fileList = await readdir(path);
+        setFiles(fileList);
+      } catch (e) {
+        console.error(e);
+        setFiles([]);
+      }
+    };
     loadFiles(currentPath);
   }, [currentPath]);
 
@@ -89,14 +91,22 @@ const FileExplorer: React.FC = () => {
   const openFile = (filename: string) => {
     const fullPath = pathModule.join(currentPath, filename);
     
-    fs.stat(fullPath, (err: any, stats: any) => {
-      if (!err) {
+    fs.stat(fullPath, (err: unknown, stats: any) => {
+      if (!err && stats) {
         if (stats.isDirectory()) {
           handleNavigate(fullPath);
         } else {
           // Determine app to open based on extension
           const ext = pathModule.extname(filename);
-          if (['.txt', '.md', '.js', '.ts', '.json', '.css', '.html'].includes(ext)) {
+          if (filename.endsWith('.project')) {
+            dispatch(openProcess({
+              appId: 'Project Viewer',
+              title: filename.replace('.project', ''),
+              icon: '/assets/icons/folder.svg',
+              componentName: 'Project Viewer',
+              initialProps: { path: fullPath }
+            }));
+          } else if (['.txt', '.md', '.js', '.ts', '.json', '.css', '.html'].includes(ext)) {
              dispatch(openProcess({
                appId: 'Notepad',
                title: filename,
@@ -105,7 +115,11 @@ const FileExplorer: React.FC = () => {
                initialProps: { path: fullPath }
              }));
           } else {
-             alert('No app associated with this file type.');
+             dispatch(showAlert({
+               title: 'Application Error',
+               message: 'No app associated with this file type.',
+               type: 'warning'
+             }));
           }
         }
       }
@@ -126,7 +140,13 @@ const FileExplorer: React.FC = () => {
             data-file-path={pathModule.join(currentPath, file)}
           >
              {/* Simple heuristic for icon */}
-            {!file.includes('.') ? <Folder size={32} color="#fcd12a" /> : <FileText size={32} color="#0078d7" />}
+            {file.endsWith('.project') ? (
+              <Folder size={32} color="#00d8ff" fill="rgba(0, 216, 255, 0.2)" /> 
+            ) : !file.includes('.') ? (
+              <Folder size={32} color="#fcd12a" /> 
+            ) : (
+              <FileText size={32} color="#0078d7" />
+            )}
             <FileName>{file}</FileName>
           </FileItem>
         ))}

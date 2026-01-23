@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { Play, RotateCcw, Terminal as TerminalIcon, AlertTriangle } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle } from 'lucide-react';
 
 const Container = styled.div`
   height: 100%;
@@ -78,7 +78,7 @@ const LogLine = styled.div<{ type: 'log' | 'error' | 'warn' }>`
 `;
 
 const JSConsole: React.FC = () => {
-  const [code, setCode] = useState('console.log("Hello from Portfolio OS!");\nconst sum = 2 + 2;\nconsole.log("2 + 2 =", sum);');
+  const [code, setCode] = useState('console.log("Hello from Roopesh Portfolio!");\nconst sum = 2 + 2;\nconsole.log("2 + 2 =", sum);');
   const [logs, setLogs] = useState<{ type: 'log' | 'error' | 'warn', content: string }[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
 
@@ -100,9 +100,9 @@ const JSConsole: React.FC = () => {
       // Create a function that wraps the user code
       // We pass a mocked console object
       const safeConsole = {
-        log: (...args: any[]) => captureLog('log', ...args),
-        error: (...args: any[]) => captureLog('error', ...args),
-        warn: (...args: any[]) => captureLog('warn', ...args),
+        log: (...args: unknown[]) => captureLog('log', ...args),
+        error: (...args: unknown[]) => captureLog('error', ...args),
+        warn: (...args: unknown[]) => captureLog('warn', ...args),
       };
 
       // Use Function constructor to limit scope (somewhat)
@@ -118,8 +118,8 @@ const JSConsole: React.FC = () => {
       `);
 
       run(safeConsole);
-    } catch (e: any) {
-      captureLog('error', e.toString());
+    } catch (e: unknown) {
+      captureLog('error', String(e));
     }
   };
 

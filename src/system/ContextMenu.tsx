@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
-import { mkdir, writeFile, fs, path as pathModule } from './FileSystem';
-import { FolderPlus, FilePlus, Code } from 'lucide-react';
+import { mkdir, writeFile, unlink, path as pathModule } from './FileSystem';
+import { FolderPlus, FilePlus, Code, Trash2 } from 'lucide-react';
 
 const Menu = styled.div<{ $x: number; $y: number }>`
   position: fixed;
@@ -133,6 +133,20 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setVisible(false);
   };
 
+  const handleDelete = async () => {
+    if (context.targetFile) {
+      if (confirm(`Are you sure you want to delete ${pathModule.basename(context.targetFile)}?`)) {
+        try {
+          await unlink(context.targetFile);
+        } catch (e) {
+          console.error(e);
+          alert('Failed to delete file');
+        }
+      }
+    }
+    setVisible(false);
+  };
+
   return (
     <>
       {children}
@@ -151,6 +165,15 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
             <Code size={16} />
             <span>Open with VS Code</span>
           </MenuItem>
+          {context.targetFile && (
+            <>
+              <Divider />
+              <MenuItem onClick={handleDelete} style={{ color: '#ff4d4d' }}>
+                <Trash2 size={16} />
+                <span>Delete</span>
+              </MenuItem>
+            </>
+          )}
         </Menu>
       )}
     </>

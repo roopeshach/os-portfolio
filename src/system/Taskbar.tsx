@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store';
 import { minimizeProcess, focusProcess } from '../store/processSlice';
-import { Menu, Wifi, Volume2, Battery, Info } from 'lucide-react';
+import { Menu, Wifi, Volume2, Battery, Info, Grid } from 'lucide-react';
 import StartMenu from './StartMenu';
 import QuickSettingsPopup from './components/tray/QuickSettingsPopup';
 import CalendarPopup from './components/tray/CalendarPopup';
 import InfoPopup from './components/tray/InfoPopup';
+import Launchpad from './components/Launchpad';
 
 const TaskbarContainer = styled.div`
   position: absolute;
@@ -114,14 +115,24 @@ const Taskbar: React.FC = () => {
 
   return (
     <>
+      {activePopup && activePopup !== 'launchpad' && (
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9990 }} 
+          onClick={() => setActivePopup(null)} 
+        />
+      )}
       {activePopup === 'start' && <StartMenu onClose={() => setActivePopup(null)} />}
       {activePopup === 'settings' && <QuickSettingsPopup />}
       {activePopup === 'calendar' && <CalendarPopup />}
       {activePopup === 'info' && <InfoPopup />}
+      {activePopup === 'launchpad' && <Launchpad onClose={() => setActivePopup(null)} />}
       
       <TaskbarContainer>
         <StartButton onClick={() => togglePopup('start')}>
           <Menu color="#00d8ff" style={{ filter: 'drop-shadow(0 0 5px #00d8ff)' }} />
+        </StartButton>
+        <StartButton onClick={() => togglePopup('launchpad')}>
+          <Grid color="#ff00ff" style={{ filter: 'drop-shadow(0 0 5px #ff00ff)' }} />
         </StartButton>
         <TaskbarItems>
           {Object.values(processes).map(process => (

@@ -12,12 +12,15 @@ const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $max
   position: absolute;
   /* Default position handled by Draggable */
   /* width and height handled by ResizableBox */
-  background: ${props => props.theme.colors.windowBackground};
-  border: 1px solid ${props => props.$active ? props.theme.colors.accent : props.theme.colors.border};
-  box-shadow: ${props => props.$active ? '0 0 10px rgba(0,0,0,0.5)' : '0 0 5px rgba(0,0,0,0.3)'};
+  background: rgba(10, 15, 30, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid ${props => props.$active ? props.theme.colors.accent : 'rgba(255, 255, 255, 0.1)'};
+  box-shadow: ${props => props.$active ? `0 0 20px rgba(0, 216, 255, 0.2)` : '0 4px 10px rgba(0,0,0,0.5)'};
   display: ${props => props.$minimized ? 'none' : 'flex'};
   flex-direction: column;
   z-index: ${props => props.$zIndex};
+  border-radius: 8px;
+  overflow: hidden;
   
   /* Fix for maximize overriding draggable transform */
   ${props => props.$maximized && `
@@ -26,47 +29,66 @@ const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $max
     left: 0 !important;
     width: 100vw !important;
     height: calc(100vh - 48px) !important; /* Adjusted for taskbar height */
+    border-radius: 0;
+    border: none;
   `}
   
   /* Only transition opacity, width/height transition conflicts with resize */
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, box-shadow 0.2s, border-color 0.2s;
 `;
 
 const TitleBar = styled.div<{ $active: boolean }>`
-  height: 30px;
-  background: ${props => props.theme.colors.windowBackground};
+  height: 36px;
+  background: ${props => props.$active ? 'linear-gradient(90deg, rgba(0, 216, 255, 0.1), transparent)' : 'transparent'};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 12px;
   user-select: none;
-  border-bottom: 1px solid ${props => props.theme.colors.border};
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
 `;
 
 const Title = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 10px;
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   flex-grow: 1;
+  color: ${props => props.theme.colors.text};
+  text-transform: uppercase;
 `;
 
 const Controls = styled.div`
   display: flex;
   height: 100%;
+  align-items: center;
+  gap: 8px;
 `;
 
 const ControlButton = styled.div<{ type?: 'close' }>`
-  width: 45px;
-  height: 100%;
+  width: 28px;
+  height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  border-radius: 4px;
+  color: ${props => props.theme.colors.textSecondary};
+  transition: all 0.2s;
+  
   &:hover {
-    background: ${props => props.type === 'close' ? '#e81123' : props.theme.colors.hover};
-    color: ${props => props.type === 'close' ? '#fff' : 'inherit'};
+    background: ${props => props.type === 'close' ? '#ff4d4d' : 'rgba(255, 255, 255, 0.1)'};
+    color: ${props => props.type === 'close' ? '#fff' : props.theme.colors.text};
+    box-shadow: 0 0 10px ${props => props.type === 'close' ? 'rgba(255, 77, 77, 0.5)' : 'rgba(255, 255, 255, 0.1)'};
   }
 `;
 
@@ -79,7 +101,7 @@ const Content = styled.div`
 `;
 
 // Add custom resize handle style
-const ResizeHandle = styled.div`
+const ResizeHandleDiv = styled.div`
   position: absolute;
   width: 10px;
   height: 10px;
@@ -99,6 +121,15 @@ const ResizeHandle = styled.div`
   }
 `;
 
+// Wrapper to filter out props passed by ResizableBox
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ResizeHandle = React.forwardRef((props: any, ref: any) => {
+  // Explicitly extract handleAxis to prevent it from being passed to the DOM
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { handleAxis, ...rest } = props;
+  return <ResizeHandleDiv ref={ref} {...rest} />;
+});
+
 interface WindowFrameProps {
   id: string;
   title: string;
@@ -117,7 +148,7 @@ const WindowFrame: React.FC<WindowFrameProps> = ({ id, title, icon, children }) 
   const [size, setSize] = useState({ width: 600, height: 400 });
 
   const isActive = activeId === id;
-  const zIndex = stack.indexOf(id) + 1; // 1-based index
+  const zIndex = stack.indexOf(id) + 100; // 1-based index + base z-index to be above desktop items
 
   const handleMouseDown = () => {
     dispatch(focusProcess(id));
@@ -135,7 +166,10 @@ const WindowFrame: React.FC<WindowFrameProps> = ({ id, title, icon, children }) 
       handle=".title-bar"
       disabled={process.maximized}
       onMouseDown={handleMouseDown}
-      defaultPosition={{x: 50 + (stack.indexOf(id) * 30), y: 50 + (stack.indexOf(id) * 30)}}
+      defaultPosition={{
+        x: Math.max(0, (window.innerWidth - size.width) / 2 + (stack.indexOf(id) * 20)),
+        y: Math.max(0, (window.innerHeight - size.height) / 2 + (stack.indexOf(id) * 20))
+      }}
     >
       <WindowContainer 
         ref={nodeRef}

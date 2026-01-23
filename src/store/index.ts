@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import processReducer from './processSlice';
 import settingsReducer from './settingsSlice';
+import systemReducer from './systemSlice';
 
 export const store = configureStore({
   reducer: {
     process: processReducer,
     settings: settingsReducer,
+    system: systemReducer,
   },
 });
 

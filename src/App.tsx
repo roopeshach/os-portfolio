@@ -5,6 +5,7 @@ import type { RootState } from './store';
 import { lightTheme, darkTheme } from './styles/theme';
 import { GlobalStyle } from './styles/GlobalStyle';
 import Desktop from './system/Desktop';
+import LockScreen from './system/LockScreen';
 import { initFileSystem } from './system/FileSystem';
 import { initializeContent } from './system/initialContent';
 import { ContextMenuProvider } from './system/ContextMenu';
@@ -25,6 +26,7 @@ const BrightnessOverlay = styled.div<{ $brightness: number }>`
 const App: React.FC = () => {
   const themeMode = useSelector((state: RootState) => state.settings.theme);
   const brightness = useSelector((state: RootState) => state.settings.brightness);
+  const isShutDown = useSelector((state: RootState) => state.system.isShutDown);
   const [fsReady, setFsReady] = useState(false);
 
   useEffect(() => {
@@ -41,6 +43,15 @@ const App: React.FC = () => {
       <div style={{ background: '#000', color: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI' }}>
         <h3>Booting Roopesh OS...</h3>
       </div>
+    );
+  }
+
+  if (isShutDown) {
+    return (
+       <ThemeProvider theme={themeMode === 'light' ? lightTheme : darkTheme}>
+         <GlobalStyle />
+         <LockScreen />
+       </ThemeProvider>
     );
   }
 

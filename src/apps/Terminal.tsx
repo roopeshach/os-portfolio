@@ -49,7 +49,7 @@ const TerminalApp: React.FC = () => {
 
     const prompt = () => `\x1b[1;34m${currentPathRef.current}\x1b[0m $ `;
 
-    term.writeln('\x1b[1;36mRoopesh OS Terminal [Version 2.0.0]\x1b[0m');
+    term.writeln('\x1b[1;36mRoopesh OS Terminal [Version 0.0.1]\x1b[0m');
     term.writeln('(c) 2026 Roopesh Acharya. All rights reserved.');
     term.writeln('Type "help" for available commands.');
     term.writeln('');
@@ -84,13 +84,15 @@ const TerminalApp: React.FC = () => {
         switch (c) {
           case 'neofetch':
             term.writeln(`
-       \x1b[36m/\\      \x1b[0m\x1b[1;37mOS:\x1b[0m RoopeshOS x86_64
-      \x1b[36m/  \\     \x1b[0m\x1b[1;37mHost:\x1b[0m Web Browser
-     \x1b[36m/ /\\ \\    \x1b[0m\x1b[1;37mKernel:\x1b[0m React 18.2.0
-    \x1b[36m/ /  \\ \\   \x1b[0m\x1b[1;37mUptime:\x1b[0m ${(performance.now() / 60000).toFixed(2)} mins
-   \x1b[36m/ /    \\ \\  \x1b[0m\x1b[1;37mResolution:\x1b[0m ${window.screen.width}x${window.screen.height}
-  \x1b[36m/ /      \\ \\ \x1b[0m\x1b[1;37mShell:\x1b[0m ZSH (Simulated)
- \x1b[36m/_/        \\_\\\x1b[0m\x1b[1;37mTheme:\x1b[0m Cyberpunk Neon
+       \x1b[38;2;255;0;255m/\\     \x1b[38;2;0;255;255m/\\      \x1b[1;37mUser:\x1b[0m \x1b[38;2;255;255;0mroot@roopesh-pc\x1b[0m
+      \x1b[38;2;255;0;255m/  \\   \x1b[38;2;0;255;255m/  \\     \x1b[1;37mOS:\x1b[0m   \x1b[38;2;0;255;255mRoopeshOS Pro v0.0.1\x1b[0m
+     \x1b[38;2;255;0;255m/ /\\ \\ \x1b[38;2;0;255;255m/ /\\ \\    \x1b[1;37mHost:\x1b[0m Web Assembly / V8
+    \x1b[38;2;255;0;255m/ /  \\ \\ \x1b[38;2;0;255;255m/ /  \\ \\   \x1b[1;37mUptime:\x1b[0m ${(performance.now() / 60000).toFixed(2)} mins
+   \x1b[38;2;255;0;255m/ /    \\ \\ \x1b[38;2;0;255;255m/ /    \\ \\  \x1b[1;37mResolution:\x1b[0m ${window.screen.width}x${window.screen.height}
+  \x1b[38;2;255;0;255m/ /      \\ \\ \x1b[38;2;0;255;255m/ /      \\ \\ \x1b[1;37mShell:\x1b[0m ZSH (Emulated)
+ \x1b[38;2;255;0;255m/_/        \\_\\ \x1b[38;2;0;255;255m/_/        \\_\\\x1b[1;37mTheme:\x1b[0m Glassmorphism Fire
+                                \x1b[1;37mCPU:\x1b[0m  Client Side Rendering
+   \x1b[41m   \x1b[42m   \x1b[43m   \x1b[44m   \x1b[45m   \x1b[46m   \x1b[0m     \x1b[1;37mMemory:\x1b[0m Infinite Virtual RAM
 `);
             break;
           case 'help':
@@ -111,7 +113,7 @@ const TerminalApp: React.FC = () => {
             try {
               const files = await readdir(currentPathRef.current);
               files.forEach(f => term.writeln(f));
-            } catch (e) {
+            } catch {
               term.writeln(`ls: cannot access '${currentPathRef.current}': No such file or directory`);
             }
             break;
@@ -154,7 +156,7 @@ const TerminalApp: React.FC = () => {
              } else {
                 const target = pathModule.resolve(currentPathRef.current, args[0]);
                 // Simplified unlink (fs.unlink)
-                // @ts-ignore
+                // @ts-expect-error fs types mismatch
                 fs.unlink(target, (err: any) => {
                    if (err) term.writeln(`rm: cannot remove '${args[0]}': ${err.message}`);
                 });
@@ -187,7 +189,7 @@ const TerminalApp: React.FC = () => {
           case '':
             break;
           default:
-            term.writeln(`'${c}' is not recognized as an internal or external command.`);
+            term.writeln(`zsh: command not found: ${c}`);
         }
       } catch (e: any) {
         term.writeln(`Error: ${e.message}`);

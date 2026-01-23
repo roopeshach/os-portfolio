@@ -83,7 +83,7 @@ const IntroAnimation = ({ playing }: { playing: boolean }) => {
           key={i}
           animate={playing ? {
             y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
+            x: [0, ((i * 1337) % 50) - 25, 0], // Deterministic random-like value
             opacity: [0, 1, 0],
           } : {}}
           transition={{ duration: 3 + i, repeat: Infinity, ease: 'easeInOut' }}

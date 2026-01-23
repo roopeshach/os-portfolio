@@ -76,13 +76,6 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
   const [status, setStatus] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
-    if (path) {
-      loadContent(path);
-      if (path.endsWith('.md')) setShowPreview(true);
-    }
-  }, [path]);
-
   const loadContent = async (filePath: string) => {
     try {
       const data = await readFile(filePath);
@@ -93,6 +86,16 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
       setStatus('Error loading file');
     }
   };
+
+  useEffect(() => {
+    if (path) {
+      const load = async () => {
+         await loadContent(path);
+         if (path.endsWith('.md')) setShowPreview(true);
+      };
+      load();
+    }
+  }, [path]);
 
   const handleSave = async () => {
     let targetPath = currentPath;

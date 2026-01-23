@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -17,18 +17,25 @@ const Display = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   height: 120px;
+  overflow: hidden;
 `;
 
 const Equation = styled.div`
   font-size: 14px;
   color: ${props => props.theme.colors.textSecondary};
   min-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Result = styled.div`
   font-size: 48px;
   font-weight: 300;
   font-family: 'Rajdhani', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Keypad = styled.div`
@@ -56,59 +63,156 @@ const Button = styled.button<{ $accent?: boolean; $secondary?: boolean }>`
   }
 `;
 
-const Calculator: React.FC = () => {
+interface CalculatorProps {
+  isActive?: boolean;
+}
+
+const Calculator: React.FC<CalculatorProps> = ({ isActive }) => {
   const [display, setDisplay] = useState('0');
   const [equation, setEquation] = useState('');
   const [shouldReset, setShouldReset] = useState(false);
 
-  const handlePress = (key: string) => {
+  const safeCalculate = (expression: string) => {
+    try {
+      // Normalize expression
+      
+      // Auto-close parenthesis
+      const openParens = (expression.match(/\(/g) || []).length;
+      const closeParens = (expression.match(/\)/g) || []).length;
+      let balancedExpr = expression;
+      if (openParens > closeParens) {
+        balancedExpr += ')'.repeat(openParens - closeParens);
+      }
+
+      const expr = balancedExpr
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/π/g, 'Math.PI')
+        .replace(/e/g, 'Math.E')
+        .replace(/\^/g, '**');
+
+      // Helper for degrees conversion
+      const toRad = (d: number) => d * (Math.PI / 180);
+      
+      // We need to inject our custom functions into the evaluation scope
+      // Using new Function with arguments
+      
+      // Replace function names with custom ones to avoid standard Math behavior (radians)
+      // We use 'sin', 'cos', 'tan' in the string, but we will pass custom functions
+      
+      // However, the user might have typed 'sin(30)' which is in the string.
+      // If we just eval 'sin(30)', we need 'sin' to be defined.
+      
+      // Define context
+      const context = {
+        sin: (d: number) => Math.sin(toRad(d)),
+        cos: (d: number) => Math.cos(toRad(d)),
+        tan: (d: number) => Math.tan(toRad(d)),
+        log: (n: number) => Math.log10(n),
+        sqrt: Math.sqrt,
+        Math: Math 
+      };
+
+      // Security check: only allow safe characters
+      if (/[^0-9+\-*/().%sinco tanlogsqrtMathPIE,_]/.test(expr)) {
+          // Check if it contains only allowed keywords
+          // This regex is too simple and might block valid stuff or allow invalid.
+          // Let's rely on the restricted scope of new Function keys.
+      }
+
+      // Create function with keys of context as arguments
+      const keys = Object.keys(context);
+      const values = Object.values(context);
+      
+      // eslint-disable-next-line no-new-func
+      const func = new Function(...keys, 'return ' + expr);
+      const result = func(...values);
+      
+      if (!isFinite(result) || isNaN(result)) return 'Error';
+      
+      // Round to avoid floating point precision issues
+      return String(Math.round(result * 10000000000) / 10000000000);
+    } catch {
+      return 'Error';
+    }
+  };
+
+  const handlePress = useCallback((key: string) => {
     if (key === 'C') {
       setDisplay('0');
       setEquation('');
       setShouldReset(false);
     } else if (key === '=') {
-      try {
-        const safeEval = new Function('return ' + equation + display);
-        const result = safeEval();
-        setEquation('');
-        setDisplay(String(result));
-        setShouldReset(true);
-      } catch {
-        setDisplay('Error');
-        setShouldReset(true);
+      // If last char is operator, remove it? No, syntax error is fine (Error).
+      // But we should append display to equation if it's not empty?
+      // If equation ends with operator, append display.
+      // If equation ends with ), implies implied multiplication? JS doesn't support 2(3).
+      // Let's just append display.
+      const finalExpr = equation + display;
+      const result = safeCalculate(finalExpr);
+      setEquation('');
+      setDisplay(result);
+      setShouldReset(true);
+    } else if (['sin', 'cos', 'tan', 'log', 'sqrt'].includes(key)) {
+      if (shouldReset) {
+        setEquation(key + '(');
+        setDisplay('0');
+        setShouldReset(false);
+      } else {
+        // If display is not 0, assume we want to wrap it? Or just append?
+        // Standard calc: hitting sin while 30 is displayed -> sin(30).
+        // Let's try that.
+        // But if we just typed 30, display is 30.
+        // If we want sin(30), we usually press sin -> 30 -> ) -> =.
+        // Or 30 -> sin (postfix).
+        // The user interface has buttons like a formula builder.
+        // So pressing 'sin' appends 'sin(' to equation.
+        setEquation(equation + key + '(');
+        setDisplay('0');
       }
-    } else if (['+', '-', '*', '/', '%'].includes(key)) {
+    } else if (['+', '-', '*', '/', '%', '^'].includes(key)) {
       setEquation(equation + display + key);
       setDisplay('0');
       setShouldReset(false);
-    } else if (['sin', 'cos', 'tan', 'log', 'sqrt'].includes(key)) {
-      try {
-        const val = parseFloat(display);
-        let res = 0;
-        switch(key) {
-          case 'sin': res = Math.sin(val); break;
-          case 'cos': res = Math.cos(val); break;
-          case 'tan': res = Math.tan(val); break;
-          case 'log': res = Math.log10(val); break;
-          case 'sqrt': res = Math.sqrt(val); break;
+    } else if (key === 'DEL') {
+      if (shouldReset) {
+        setDisplay('0');
+        setShouldReset(false);
+      } else {
+        if (display.length > 1) {
+          setDisplay(display.slice(0, -1));
+        } else {
+          setDisplay('0');
         }
-        setDisplay(String(res));
-        setShouldReset(true);
-      } catch {
-        setDisplay('Error');
       }
-    } else if (key === 'pi') {
-      setDisplay(String(Math.PI));
-      setShouldReset(true);
     } else {
+      // Numbers, ., (, )
       if (shouldReset) {
         setDisplay(key);
         setShouldReset(false);
       } else {
-        setDisplay(display === '0' ? key : display + key);
+        setDisplay(display === '0' && key !== '.' ? key : display + key);
       }
     }
-  };
+  }, [display, equation, shouldReset]);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key;
+      
+      if (/[0-9]/.test(key)) handlePress(key);
+      if (key === '.') handlePress('.');
+      if (key === 'Enter') handlePress('=');
+      if (key === 'Backspace') handlePress('DEL');
+      if (key === 'Escape') handlePress('C');
+      if (['+', '-', '*', '/', '%', '^', '(', ')'].includes(key)) handlePress(key);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isActive, handlePress]);
 
   return (
     <Container>

@@ -110,8 +110,17 @@ const QuickSettingsPopup: React.FC = () => {
     dispatch(openProcess({
       appId: 'Performance',
       title: 'Performance Monitor',
-      icon: '/assets/icons/task-manager.svg', // Will need to add this
+      icon: '/assets/icons/task-manager.svg',
       componentName: 'Performance',
+    }));
+  };
+
+  const handleProjects = () => {
+    dispatch(openProcess({
+      appId: 'Project Navigator',
+      title: 'Project Navigator',
+      icon: '/assets/icons/folder.svg',
+      componentName: 'Project Navigator',
     }));
   };
 
@@ -125,7 +134,7 @@ const QuickSettingsPopup: React.FC = () => {
             <TileLabel>CyberNet_5G</TileLabel>
           </Tile>
           {/* Removed Bluetooth as requested */}
-          <Tile>
+          <Tile onClick={handleProjects}>
             <Monitor size={20} />
             <TileLabel>Project</TileLabel>
           </Tile>

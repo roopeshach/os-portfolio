@@ -8,7 +8,7 @@ export interface ProcessState {
   minimized: boolean;
   maximized: boolean;
   componentName: string; // The React component to render
-  initialProps?: any;
+  initialProps?: Record<string, unknown>;
 }
 
 interface SystemState {
@@ -27,7 +27,7 @@ const processSlice = createSlice({
   name: 'process',
   initialState,
   reducers: {
-    openProcess: (state, action: PayloadAction<{ appId: string; title: string; icon: string; componentName: string; initialProps?: any }>) => {
+    openProcess: (state, action: PayloadAction<{ appId: string; title: string; icon: string; componentName: string; initialProps?: Record<string, unknown> }>) => {
       const id = `${action.payload.appId}-${Date.now()}`;
       state.processes[id] = {
         id,

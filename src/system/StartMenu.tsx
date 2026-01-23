@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
+import { setShutdown } from '../store/systemSlice';
 import { AppMetadata } from '../apps/registry';
 import { Power } from 'lucide-react';
 
@@ -75,6 +76,13 @@ interface StartMenuProps {
 const StartMenu: React.FC<StartMenuProps> = ({ onClose }) => {
   const dispatch = useDispatch();
 
+  const handleShutdown = () => {
+    if (window.confirm('WARNING: All unsaved data will be lost. Are you sure you want to shut down?')) {
+       dispatch(setShutdown(true));
+       onClose();
+    }
+  };
+
   const handleLaunch = (appName: string) => {
     const meta = AppMetadata[appName as keyof typeof AppMetadata];
     dispatch(openProcess({
@@ -94,7 +102,7 @@ const StartMenu: React.FC<StartMenuProps> = ({ onClose }) => {
   return (
     <StartMenuContainer id="start-menu">
       <Sidebar>
-        <PowerButton>
+        <PowerButton onClick={handleShutdown} title="Shut Down">
             <Power size={20} />
         </PowerButton>
       </Sidebar>

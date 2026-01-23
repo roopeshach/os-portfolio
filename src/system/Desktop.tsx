@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '../store';
+import React, { useState, useEffect, useCallback } from 'react';
+import styled, { css, keyframes } from 'styled-components';
+import { useDispatch } from 'react-redux';
 import Taskbar from './Taskbar';
 import WindowManager from './WindowManager';
 import { readdir, fs, path as pathModule } from './FileSystem';
 import { openProcess } from '../store/processSlice';
-import { Folder, FileText, Globe, Terminal, Code, File } from 'lucide-react';
+import { Folder, Terminal, Globe, FileText, Code, File } from 'lucide-react';
+import type { Stats, ErrnoException } from '../types/filesystem';
+import SystemAlert from './components/SystemAlert';
+import { showAlert } from '../store/systemSlice';
+import FireWallpaper from './components/FireWallpaper';
 
-const DesktopContainer = styled.div<{ $wallpaper: string }>`
+const DesktopContainer = styled.div`
   width: 100%;
   height: 100%;
-  background-image: url(${props => props.$wallpaper});
-  background-size: cover;
-  background-position: center;
   position: relative;
   overflow: hidden;
+  background: #000;
 `;
 
 const DesktopIcons = styled.div`
@@ -58,12 +59,74 @@ const IconLabel = styled.div`
   line-height: 1.2;
 `;
 
+const fadeInOut = keyframes`
+  0% { opacity: 0; transform: translateY(-20px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10px); }
+`;
+
+const GreetingContainer = styled.div`
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+`;
+
+const NameText = styled.h1`
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 72px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #00f2ff;
+  text-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+  animation: ${fadeInOut} 4s infinite;
+`;
+
+const GreetingText = styled.div`
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 24px;
+  color: #00f2ff;
+  margin-top: 10px;
+  min-height: 30px;
+  animation: ${() => css`${fadeInOut} 4s infinite`};
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+`;
+
 const Desktop: React.FC = () => {
-  const wallpaper = useSelector((state: RootState) => state.settings.wallpaper);
   const dispatch = useDispatch();
   const [items, setItems] = useState<string[]>([]);
+  const [greetingIndex, setGreetingIndex] = useState(0);
+  
+  const greetingData = [
+    { name: "ROOPESH ACHARYA", text: "Welcome to my digital space" },
+    { name: "रुपेश आचार्य", text: "मेरो डिजिटल संसारमा स्वागत छ" },
+    { name: "ROOPESH ACHARYA", text: "Explore my projects & skills" },
+    { name: "रुपेश आचार्य", text: "मेरा प्रोजेक्ट र सीपहरु हेर्नुहोस्" },
+    { name: "ROOPESH ACHARYA", text: "Built with React & TypeScript" },
+    { name: "रुपेश आचार्य", text: "रियाक्ट र टाइपस्क्रिप्टमा निर्मित" },
+    { name: "ROOPESH ACHARYA", text: "Enjoy the experience" },
+    { name: "रुपेश आचार्य", text: "अनुभवको आनन्द लिनुहोस्" }
+  ];
 
-  const loadDesktopItems = async () => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGreetingIndex(prev => (prev + 1) % greetingData.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadDesktopItems = useCallback(async () => {
     try {
       const desktopPath = '/Users/Roopesh/Desktop';
       const files = await readdir(desktopPath);
@@ -71,20 +134,34 @@ const Desktop: React.FC = () => {
     } catch (e) {
       console.error('Failed to load desktop items', e);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadDesktopItems();
     // Poll for changes occasionally or setup a watcher (polling is simpler for now)
-    const interval = setInterval(loadDesktopItems, 5000);
+    const load = () => {
+        loadDesktopItems();
+    };
+    load();
+    const interval = setInterval(load, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadDesktopItems]);
 
   const handleOpen = (filename: string) => {
     const fullPath = pathModule.join('/Users/Roopesh/Desktop', filename);
     
-    fs.stat(fullPath, (err: any, stats: any) => {
-      if (!err) {
+    // Check for Projects folder shortcut
+    if (filename === 'Projects') {
+      dispatch(openProcess({
+        appId: 'Project Navigator',
+        title: 'Project Navigator',
+        icon: '/assets/icons/folder.svg',
+        componentName: 'Project Navigator',
+      }));
+      return;
+    }
+
+    fs.stat(fullPath, (err: ErrnoException | null, stats?: Stats) => {
+      if (!err && stats) {
         if (stats.isDirectory()) {
           dispatch(openProcess({
             appId: 'File Explorer',
@@ -119,15 +196,19 @@ const Desktop: React.FC = () => {
             }));
           } else if (['.txt', '.md', '.json', '.ts', '.js'].includes(ext)) {
             dispatch(openProcess({
-              appId: 'Notepad',
+              appId: 'VS Code',
               title: filename,
-              icon: '/assets/icons/notepad.svg',
-              componentName: 'Notepad',
+              icon: '/assets/icons/vscode.svg',
+              componentName: 'VS Code',
               initialProps: { path: fullPath }
             }));
           } else {
              // Default fallback
-             alert(`Cannot open ${filename}`);
+             dispatch(showAlert({
+               title: 'System Error',
+               message: `Cannot open ${filename}. No application associated with this file type.`,
+               type: 'error'
+             }));
           }
         }
       }
@@ -145,7 +226,16 @@ const Desktop: React.FC = () => {
   };
 
   return (
-    <DesktopContainer $wallpaper={wallpaper}>
+    <DesktopContainer>
+      <FireWallpaper />
+      <GreetingContainer>
+        <NameText key={`name-${greetingIndex}`}>
+            {greetingData[greetingIndex].name}
+        </NameText>
+        <GreetingText key={`greeting-${greetingIndex}`}>
+           {greetingData[greetingIndex].text}
+        </GreetingText>
+      </GreetingContainer>
       <DesktopIcons>
         <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: '/assets/icons/terminal.svg', componentName: 'Terminal' }))}>
           <Terminal size={40} color="#333" fill="#ccc" />
@@ -170,6 +260,7 @@ const Desktop: React.FC = () => {
       </DesktopIcons>
       <WindowManager />
       <Taskbar />
+      <SystemAlert />
     </DesktopContainer>
   );
 };
