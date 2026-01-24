@@ -17,6 +17,10 @@ const TerminalApp: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<XTerm | null>(null);
   const currentPathRef = useRef<string>('/Users/Roopesh');
+  const commandRef = useRef<string>('');
+  const cursorRef = useRef<number>(0);
+  const historyRef = useRef<string[]>([]);
+  const historyIndexRef = useRef<number>(-1);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,6 +35,7 @@ const TerminalApp: React.FC = () => {
       cursorBlink: true,
       fontSize: 14,
       fontFamily: 'Consolas, "Courier New", monospace',
+      convertEol: true, // Treat \n as \r\n
     });
 
     const fitAddon = new FitAddon();
@@ -55,23 +60,116 @@ const TerminalApp: React.FC = () => {
     term.writeln('');
     term.write(prompt());
 
-    let command = '';
+    const refreshLine = () => {
+       // Move cursor to start of line (after prompt)
+       // We can't easily jump to absolute column without knowing prompt length stripping ANSI
+       // Simplest: clear line, write prompt + buffer
+       term.write('\x1b[2K\r'); // Clear line and return carriage
+       term.write(prompt() + commandRef.current);
+       
+       // Move cursor to correct position
+       const diff = commandRef.current.length - cursorRef.current;
+       if (diff > 0) {
+           term.write(`\x1b[${diff}D`);
+       }
+    };
 
-    term.onData((data) => {
+    term.onData(async (data) => {
       const code = data.charCodeAt(0);
       
-      if (code === 13) { // Enter
+      // Enter
+      if (code === 13) { 
         term.writeln('');
-        processCommand(command);
-        command = '';
-      } else if (code === 127) { // Backspace
-        if (command.length > 0) {
-          command = command.slice(0, -1);
-          term.write('\b \b');
+        const cmd = commandRef.current;
+        if (cmd.trim().length > 0) {
+           historyRef.current.push(cmd);
+           historyIndexRef.current = historyRef.current.length;
         }
-      } else {
-        command += data;
-        term.write(data);
+        await processCommand(cmd);
+        commandRef.current = '';
+        cursorRef.current = 0;
+        // Prompt is written by processCommand
+      } 
+      // Backspace
+      else if (code === 127) { 
+        if (cursorRef.current > 0) {
+          const left = commandRef.current.slice(0, cursorRef.current - 1);
+          const right = commandRef.current.slice(cursorRef.current);
+          commandRef.current = left + right;
+          cursorRef.current--;
+          refreshLine();
+        }
+      } 
+      // Arrow Keys (ANSI sequences)
+      else if (data === '\x1b[A') { // Up
+        if (historyIndexRef.current > 0) {
+            historyIndexRef.current--;
+            commandRef.current = historyRef.current[historyIndexRef.current];
+            cursorRef.current = commandRef.current.length;
+            refreshLine();
+        }
+      }
+      else if (data === '\x1b[B') { // Down
+        if (historyIndexRef.current < historyRef.current.length - 1) {
+            historyIndexRef.current++;
+            commandRef.current = historyRef.current[historyIndexRef.current];
+            cursorRef.current = commandRef.current.length;
+            refreshLine();
+        } else {
+            historyIndexRef.current = historyRef.current.length;
+            commandRef.current = '';
+            cursorRef.current = 0;
+            refreshLine();
+        }
+      }
+      else if (data === '\x1b[D') { // Left
+        if (cursorRef.current > 0) {
+            cursorRef.current--;
+            term.write('\x1b[D');
+        }
+      }
+      else if (data === '\x1b[C') { // Right
+        if (cursorRef.current < commandRef.current.length) {
+            cursorRef.current++;
+            term.write('\x1b[C');
+        }
+      }
+      // Tab Autocomplete
+      else if (code === 9) {
+          // Prevent default tab behavior if possible (browser might trap it, but here we get raw char)
+          // Simple autocomplete: last word
+          const parts = commandRef.current.split(' ');
+          const lastWord = parts[parts.length - 1];
+          if (lastWord.length > 0) {
+             try {
+                const files = await readdir(currentPathRef.current);
+                const matches = files.filter(f => f.startsWith(lastWord));
+                if (matches.length === 1) {
+                    const completed = matches[0];
+                    const rest = completed.slice(lastWord.length);
+                    commandRef.current += rest;
+                    cursorRef.current += rest.length;
+                    refreshLine();
+                } else if (matches.length > 1) {
+                    term.writeln('');
+                    term.writeln(matches.join('  '));
+                    term.write(prompt() + commandRef.current);
+                    // restore cursor? refreshLine handles it but we just printed prompt
+                    const diff = commandRef.current.length - cursorRef.current;
+                    if (diff > 0) term.write(`\x1b[${diff}D`);
+                }
+             } catch {
+                 // ignore
+             }
+          }
+      }
+      // Regular printable characters
+      else if (code >= 32 && code !== 127 && data.length === 1) {
+        const left = commandRef.current.slice(0, cursorRef.current);
+        const right = commandRef.current.slice(cursorRef.current);
+        commandRef.current = left + data + right;
+        cursorRef.current++;
+        refreshLine();
       }
     });
 
@@ -96,7 +194,7 @@ const TerminalApp: React.FC = () => {
 `);
             break;
           case 'help':
-            term.writeln('Available commands: help, clear, echo, ls, cd, pwd, mkdir, touch, rm, cat, neofetch, whoami, github, contact');
+            term.writeln('Available commands: help, clear, echo, ls, cd, pwd, mkdir, touch, rm, cat, neofetch, whoami, github, contact, date, history, cp, mv');
             break;
           case 'clear':
           case 'cls':
@@ -112,7 +210,16 @@ const TerminalApp: React.FC = () => {
           case 'dir':
             try {
               const files = await readdir(currentPathRef.current);
-              files.forEach(f => term.writeln(f));
+              // Colorize directories (mock check for now as readdir returns strings)
+              // Ideally we check stat for each, but for speed we might skip or do async
+              // Let's do a quick stat
+              const coloredFiles = await Promise.all(files.map(async f => {
+                 try {
+                   const s = await new Promise<any>(r => fs.stat(pathModule.join(currentPathRef.current, f), (e,s) => r(s)));
+                   return s?.isDirectory() ? `\x1b[1;34m${f}\x1b[0m` : f;
+                 } catch { return f; }
+              }));
+              term.writeln(coloredFiles.join('  '));
             } catch {
               term.writeln(`ls: cannot access '${currentPathRef.current}': No such file or directory`);
             }
@@ -126,8 +233,6 @@ const TerminalApp: React.FC = () => {
                const target = pathModule.resolve(currentPathRef.current, args[0]);
                const doesExist = await exists(target);
                if (doesExist) {
-                 // Check if directory
-                 // fs.stat is async but we need to check if it's dir. Simplified for now.
                  currentPathRef.current = target;
                } else {
                  term.writeln(`cd: no such file or directory: ${args[0]}`);
@@ -155,7 +260,6 @@ const TerminalApp: React.FC = () => {
                term.writeln('rm: missing operand');
              } else {
                 const target = pathModule.resolve(currentPathRef.current, args[0]);
-                // Simplified unlink (fs.unlink)
                 // @ts-expect-error fs types mismatch
                 fs.unlink(target, (err: any) => {
                    if (err) term.writeln(`rm: cannot remove '${args[0]}': ${err.message}`);
@@ -185,6 +289,14 @@ const TerminalApp: React.FC = () => {
           case 'contact':
             term.writeln('Email: roopesh@example.com');
             term.writeln('LinkedIn: https://linkedin.com/in/rupeshach');
+            break;
+          case 'date':
+            term.writeln(new Date().toString());
+            break;
+          case 'history':
+            historyRef.current.forEach((cmd, i) => {
+                term.writeln(` ${i + 1}  ${cmd}`);
+            });
             break;
           case '':
             break;
