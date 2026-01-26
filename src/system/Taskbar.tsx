@@ -17,12 +17,11 @@ const TaskbarContainer = styled.div`
   width: 100%;
   height: ${props => props.theme.sizes.taskbarHeight};
   background: ${props => props.theme.colors.taskbar};
-  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 9999;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid #000;
 `;
 
 const StartButton = styled.div`
@@ -32,35 +31,41 @@ const StartButton = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  border-right: 3px solid #000;
   &:hover {
-    background: ${props => props.theme.colors.taskbarHover};
-    box-shadow: 0 0 10px ${props => props.theme.colors.accent};
+    background: ${props => props.theme.colors.accent};
   }
-  transition: all 0.2s ease;
+  &:active {
+    background: #000;
+  }
+  transition: background 0.1s;
 `;
 
 const TaskbarItems = styled.div`
   display: flex;
   flex: 1;
   height: 100%;
-  padding-left: 10px;
 `;
 
 const TaskbarEntry = styled.div<{ $active: boolean }>`
-  width: 48px; /* Or variable width with text */
+  width: 160px;
   height: 100%;
   display: flex;
-  justify-content: center;
+  padding: 0 10px;
+  justify-content: flex-start;
   align-items: center;
-  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
-  border-bottom: 2px solid ${props => props.$active ? props.theme.colors.accent : 'transparent'};
+  gap: 8px;
+  background: ${props => props.$active ? props.theme.colors.accent : 'transparent'};
+  border-right: 3px solid #000;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  color: ${props => props.$active ? '#fff' : props.theme.colors.text};
+  
   &:hover {
-    background: ${props => props.theme.colors.taskbarHover};
-    box-shadow: inset 0 -2px 5px ${props => props.theme.colors.accent};
+    background: ${props => props.$active ? props.theme.colors.accent : props.theme.colors.taskbarHover};
   }
-  margin-right: 2px;
-  transition: all 0.2s ease;
+  transition: background 0.1s;
 `;
 
 const Tray = styled.div`
@@ -129,10 +134,10 @@ const Taskbar: React.FC = () => {
       
       <TaskbarContainer>
         <StartButton onClick={() => togglePopup('start')}>
-          <Menu color="#00d8ff" style={{ filter: 'drop-shadow(0 0 5px #00d8ff)' }} />
+          <Menu color="#D2691E" style={{ filter: 'drop-shadow(0 0 2px #000)' }} />
         </StartButton>
         <StartButton onClick={() => togglePopup('launchpad')}>
-          <Grid color="#ff00ff" style={{ filter: 'drop-shadow(0 0 5px #ff00ff)' }} />
+          <Grid color="#D2691E" style={{ filter: 'drop-shadow(0 0 2px #000)' }} />
         </StartButton>
         <TaskbarItems>
           {Object.values(processes).map(process => (
@@ -149,12 +154,13 @@ const Taskbar: React.FC = () => {
               title={process.title}
             >
               <img src={process.icon} style={{width: 20, height: 20}} alt="" onError={(e) => e.currentTarget.style.display = 'none'} />
+              <span>{process.title}</span>
             </TaskbarEntry>
           ))}
         </TaskbarItems>
         <Tray>
           <TrayIcon onClick={() => togglePopup('info')}>
-             <Info size={18} color="#00d8ff" />
+             <Info size={18} color="#D2691E" />
           </TrayIcon>
 
           <TrayIcon onClick={() => togglePopup('settings')}>

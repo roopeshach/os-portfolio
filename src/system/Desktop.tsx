@@ -35,20 +35,25 @@ const DesktopIcons = styled.div`
 `;
 
 const IconWrapper = styled.div`
-  width: 80px;
+  width: 90px;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
+  padding: 10px;
+  border: 2px solid transparent;
   pointer-events: auto;
+  
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
+    background: ${props => props.theme.colors.accent};
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0px #000;
+    color: #fff;
   }
-  color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  
+  color: ${props => props.theme.colors.text};
+  font-weight: bold;
+  transition: all 0.1s;
 `;
 
 const IconLabel = styled.div`
@@ -83,24 +88,29 @@ const GreetingContainer = styled.div`
 const NameText = styled.h1`
   font-family: 'Rajdhani', sans-serif;
   font-size: 72px;
-  font-weight: 700;
+  font-weight: 900;
   margin: 0;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: #00f2ff;
-  text-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+  color: ${props => props.theme.colors.accent};
+  /* Hard shadow for brutalism */
+  text-shadow: 4px 4px 0px #000;
   animation: ${fadeInOut} 4s infinite;
+  -webkit-text-stroke: 1px #000;
 `;
 
 const GreetingText = styled.div`
   font-family: 'Rajdhani', sans-serif;
   font-size: 24px;
-  color: #00f2ff;
+  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.background};
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  padding: 5px 15px;
   margin-top: 10px;
   min-height: 30px;
   animation: ${() => css`${fadeInOut} 4s infinite`};
-  font-weight: 600;
-  text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+  font-weight: 700;
 `;
 
 const Desktop: React.FC = () => {
@@ -217,12 +227,12 @@ const Desktop: React.FC = () => {
 
   const getIcon = (filename: string) => {
     if (filename.includes('.')) {
-      if (filename.endsWith('.link')) return <Globe size={40} color="#0078d7" />;
+      if (filename.endsWith('.link')) return <Globe size={40} color="#D2691E" />;
       if (filename.endsWith('.txt')) return <FileText size={40} color="#fff" />;
-      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color="#f0db4f" />;
+      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color="#D2691E" />;
       return <File size={40} color="#fff" />;
     }
-    return <Folder size={40} color="#fcd12a" />;
+    return <Folder size={40} color="#D2691E" />;
   };
 
   return (
@@ -243,7 +253,7 @@ const Desktop: React.FC = () => {
         </IconWrapper>
         
         <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: '/assets/icons/folder.svg', componentName: 'File Explorer' }))}>
-           <Folder size={40} color="#fcd12a" />
+           <Folder size={40} color="#D2691E" />
            <IconLabel>This PC</IconLabel>
         </IconWrapper>
 

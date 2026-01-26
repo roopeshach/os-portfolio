@@ -11,12 +11,11 @@ const PopupContainer = styled.div`
   bottom: 60px;
   right: 10px;
   width: 320px;
-  background: rgba(10, 15, 30, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
+  background: ${props => props.theme.colors.windowBackground};
+  border: 3px solid #000;
+  border-radius: 0;
   padding: 16px;
-  box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
+  box-shadow: 8px 8px 0px #000;
   z-index: 10000;
   color: ${props => props.theme.colors.text};
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -44,20 +43,27 @@ const Grid = styled.div`
   gap: 10px;
 `;
 
-const Tile = styled.div<{ active?: boolean }>`
-  background: ${props => props.active ? 'rgba(0, 216, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.active ? props.theme.colors.accent : 'transparent'};
-  border-radius: 8px;
+  const Tile = styled.div<{ active?: boolean }>`
+  background: ${props => props.active ? props.theme.colors.accent : '#fff'};
+  border: 2px solid #000;
+  border-radius: 0;
   padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.1s;
+  color: ${props => props.active ? '#fff' : '#000'};
+  box-shadow: 4px 4px 0px #000;
   
   &:hover {
-    background: ${props => props.active ? 'rgba(0, 216, 255, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #000;
+  }
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0px #000;
   }
 `;
 
@@ -130,7 +136,7 @@ const QuickSettingsPopup: React.FC = () => {
         <SectionTitle>Connectivity</SectionTitle>
         <Grid>
           <Tile active>
-            <Wifi size={20} color="#00d8ff" />
+            <Wifi size={20} color="#D2691E" />
             <TileLabel>CyberNet_5G</TileLabel>
           </Tile>
           {/* Removed Bluetooth as requested */}

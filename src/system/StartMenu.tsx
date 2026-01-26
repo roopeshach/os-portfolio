@@ -8,17 +8,17 @@ import { Power } from 'lucide-react';
 
 const StartMenuContainer = styled.div`
   position: absolute;
-  bottom: 40px; /* Taskbar height */
+  bottom: 48px; /* Taskbar height */
   left: 0;
   width: 350px;
   height: 500px;
   background: ${props => props.theme.colors.startMenu};
-  backdrop-filter: blur(15px);
-  border-top-right-radius: 5px;
+  border: 3px solid #000;
+  border-bottom: none;
+  box-shadow: 8px -8px 0px #000;
   display: flex;
-  flex-direction: row; /* Change to row to put sidebar and list side-by-side */
+  flex-direction: row;
   z-index: 9998;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
   animation: slideUp 0.2s ease-out;
 
   @keyframes slideUp {
@@ -48,12 +48,19 @@ const AppEntry = styled.div`
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  border-radius: 4px;
+  border: 2px solid transparent;
   gap: 10px;
   color: ${props => props.theme.colors.text};
+  font-weight: 600;
+  
   &:hover {
     background: ${props => props.theme.colors.hover};
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0px #000;
+    transform: translate(-2px, -2px);
+    color: #fff;
   }
+  transition: all 0.1s;
 `;
 
 const PowerButton = styled.div`

@@ -363,7 +363,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
              node.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />
           ) : <span style={{ width: 14 }} />}
           
-          {node.isDirectory ? <Folder size={14} color="#dcb67a" /> : <File size={14} color="#519aba" />}
+          {node.isDirectory ? <Folder size={14} color="#D2691E" /> : <File size={14} color="#8C7B68" />}
           {node.name}
         </TreeItem>
         {node.isDirectory && node.isOpen && node.children && (

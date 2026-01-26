@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { setShutdown } from '../store/systemSlice';
 import { Power } from 'lucide-react';
+import FireWallpaper from './components/FireWallpaper';
 
 const Container = styled.div`
   position: fixed;
@@ -10,65 +11,67 @@ const Container = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000;
+  background: transparent; /* Wallpaper visible */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 100000;
-  color: #fff;
+  color: ${props => props.theme.colors.text};
   font-family: 'Rajdhani', sans-serif;
-`;
-
-const Background = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  opacity: 0.5;
-  z-index: -1;
 `;
 
 const UserAvatar = styled.div`
   width: 120px;
   height: 120px;
-  border-radius: 50%;
-  background: #333;
+  border-radius: 0; /* Brutalist Square */
+  background: ${props => props.theme.colors.windowBackground};
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(0, 216, 255, 0.2);
+  border: 3px solid #000;
+  box-shadow: 8px 8px 0px #000;
+  color: ${props => props.theme.colors.text};
+  position: relative;
+  z-index: 1;
 `;
 
 const UserName = styled.h2`
   font-size: 32px;
   margin-bottom: 40px;
-  font-weight: 500;
+  font-weight: 700;
+  text-shadow: 2px 2px 0px #000;
+  z-index: 1;
 `;
 
 const EnterButton = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: ${props => props.theme.colors.windowBackground};
+  border: 3px solid #000;
   padding: 12px 40px;
-  color: #fff;
+  color: ${props => props.theme.colors.text};
   font-size: 18px;
-  border-radius: 30px;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s;
   font-family: 'Rajdhani', sans-serif;
   display: flex;
   align-items: center;
   gap: 10px;
+  box-shadow: 6px 6px 0px #000;
+  z-index: 1;
+  font-weight: bold;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    transform: scale(1.05);
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px #000;
+    background: ${props => props.theme.colors.accent};
+    color: #fff;
+  }
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0px #000;
   }
 `;
 
@@ -76,14 +79,19 @@ const TimeDisplay = styled.div`
   position: absolute;
   bottom: 50px;
   font-size: 64px;
-  font-weight: 100;
+  font-weight: 900;
+  color: ${props => props.theme.colors.text};
+  text-shadow: 4px 4px 0px #000;
+  z-index: 1;
 `;
 
 const DateDisplay = styled.div`
   position: absolute;
   bottom: 30px;
   font-size: 18px;
-  color: #aaa;
+  color: ${props => props.theme.colors.textSecondary};
+  font-weight: 600;
+  z-index: 1;
 `;
 
 const LockScreen: React.FC = () => {
@@ -101,7 +109,7 @@ const LockScreen: React.FC = () => {
 
   return (
     <Container>
-      <Background />
+      <FireWallpaper />
       <UserAvatar>RA</UserAvatar>
       <UserName>Roopesh Acharya</UserName>
       

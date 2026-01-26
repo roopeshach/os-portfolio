@@ -1,39 +1,39 @@
 import type { DefaultTheme } from 'styled-components';
 
-// Futuristic / Cyberpunk / Glassmorphism Theme
+// Soil/Orange Dark Theme
 export const darkTheme: DefaultTheme = {
   colors: {
-    background: '#050510',
-    taskbar: 'rgba(10, 10, 20, 0.7)',
-    taskbarHover: 'rgba(0, 255, 255, 0.15)',
-    startMenu: 'rgba(15, 15, 30, 0.85)',
-    windowBackground: 'rgba(20, 20, 35, 0.9)',
-    text: '#e0e0ff',
-    textSecondary: '#a0a0cc',
-    accent: '#00d8ff', // Cyan neon
-    border: 'rgba(0, 216, 255, 0.3)',
-    selection: 'rgba(0, 216, 255, 0.2)',
-    hover: 'rgba(0, 216, 255, 0.1)',
+    background: '#262421', // Peat
+    taskbar: '#1E1C1A',
+    taskbarHover: '#D2691E', // Chocolate (Soil Orange)
+    startMenu: '#262421',
+    windowBackground: '#262421',
+    text: '#E6DCCF', // Light Sand
+    textSecondary: '#D2691E',
+    accent: '#D2691E', // Chocolate
+    border: '#000000',
+    selection: '#D2691E',
+    hover: '#D2691E',
   },
   sizes: {
     taskbarHeight: '48px',
   },
 };
 
-// Keeping light theme simple but slightly modernized
+// Soil/Orange Light Theme
 export const lightTheme: DefaultTheme = {
   colors: {
-    background: '#f0f4f8',
-    taskbar: 'rgba(255, 255, 255, 0.8)',
-    taskbarHover: 'rgba(0, 0, 0, 0.05)',
-    startMenu: 'rgba(255, 255, 255, 0.9)',
-    windowBackground: 'rgba(255, 255, 255, 0.95)',
-    text: '#1a1a2e',
-    textSecondary: '#555577',
-    accent: '#0078d7',
-    border: '#d1d9e6',
-    selection: 'rgba(0, 120, 215, 0.2)',
-    hover: 'rgba(0, 0, 0, 0.05)',
+    background: '#E6DCCF', // Light Sand
+    taskbar: '#E6DCCF',
+    taskbarHover: '#D2691E',
+    startMenu: '#E6DCCF',
+    windowBackground: '#F0EBE5',
+    text: '#1E1C1A',
+    textSecondary: '#8B4513', // SaddleBrown
+    accent: '#D2691E', // Chocolate
+    border: '#000000',
+    selection: '#D2691E',
+    hover: '#D2691E',
   },
   sizes: {
     taskbarHeight: '48px',
