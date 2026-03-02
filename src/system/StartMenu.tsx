@@ -13,9 +13,10 @@ const StartMenuContainer = styled.div`
   width: 350px;
   height: 500px;
   background: ${props => props.theme.colors.startMenu};
-  border: 3px solid #000;
+  border: 1px solid ${props => props.theme.colors.border};
   border-bottom: none;
-  box-shadow: 8px -8px 0px #000;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+  border-radius: 12px 12px 0 0;
   display: flex;
   flex-direction: row;
   z-index: 9998;
@@ -49,18 +50,17 @@ const AppEntry = styled.div`
   padding: 10px;
   cursor: pointer;
   border: 2px solid transparent;
+  border-radius: 8px;
   gap: 10px;
   color: ${props => props.theme.colors.text};
   font-weight: 600;
   
   &:hover {
     background: ${props => props.theme.colors.hover};
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0px #000;
-    transform: translate(-2px, -2px);
+    border: 2px solid ${props => props.theme.colors.border};
     color: #fff;
   }
-  transition: all 0.1s;
+  transition: all 0.15s ease;
 `;
 
 const PowerButton = styled.div`

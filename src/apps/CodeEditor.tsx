@@ -75,7 +75,7 @@ const Tab = styled.div<{ $active: boolean }>`
   padding: 8px 12px;
   background: ${props => props.$active ? '#1e1e1e' : '#2d2d2d'};
   color: ${props => props.$active ? '#fff' : '#999'};
-  border-top: 2px solid ${props => props.$active ? '#007acc' : 'transparent'};
+  border-top: 2px solid ${props => props.$active ? props.theme.colors.accent : 'transparent'};
   border-right: 1px solid #1e1e1e;
   font-size: 13px;
   display: flex;

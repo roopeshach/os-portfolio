@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { fs, readdir, path as pathModule, mkdir, writeFile, readFile, exists } from '../system/FileSystem';
 
 const TerminalContainer = styled.div`
@@ -21,16 +21,33 @@ const TerminalApp: React.FC = () => {
   const cursorRef = useRef<number>(0);
   const historyRef = useRef<string[]>([]);
   const historyIndexRef = useRef<number>(-1);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const term = new XTerm({
       theme: {
-        background: '#050510',
-        foreground: '#00d8ff',
-        cursor: '#00d8ff',
-        selectionBackground: 'rgba(0, 216, 255, 0.3)',
+        background: theme.colors.background,
+        foreground: theme.colors.text,
+        cursor: theme.colors.accent,
+        selectionBackground: `${theme.colors.accent}4D`, // 30% opacity
+        black: '#000000',
+        red: '#cc0000',
+        green: '#4e9a06',
+        yellow: '#c4a000',
+        blue: '#3465a4',
+        magenta: '#75507b',
+        cyan: '#06989a',
+        white: '#d3d7cf',
+        brightBlack: '#555753',
+        brightRed: '#ef2929',
+        brightGreen: '#8ae234',
+        brightYellow: '#fce94f',
+        brightBlue: '#729fcf',
+        brightMagenta: '#ad7fa8',
+        brightCyan: '#34e2e2',
+        brightWhite: '#eeeeec'
       },
       cursorBlink: true,
       fontSize: 14,

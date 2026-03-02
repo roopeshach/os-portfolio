@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { readdir, fs, path as pathModule } from '../system/FileSystem';
+import { readdir, fs, path as pathModule, mkdir, writeFile } from '../system/FileSystem';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
 import { showAlert } from '../store/systemSlice';
 import { 
-  Folder, FileText, ArrowLeft
+  Folder, FileText, ArrowLeft, FilePlus, FolderPlus
 } from 'lucide-react';
 
 const ExplorerContainer = styled.div`
@@ -28,6 +28,29 @@ const AddressBar = styled.input`
   background: ${props => props.theme.colors.background};
   border: 1px solid ${props => props.theme.colors.border};
   color: ${props => props.theme.colors.text};
+`;
+
+const IconButton = styled.button`
+  background: ${props => props.theme.colors.windowBackground};
+  border: 1px solid ${props => props.theme.colors.border};
+  color: ${props => props.theme.colors.text};
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: bold;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  
+  &:hover {
+    background: ${props => props.theme.colors.accent};
+    border-color: ${props => props.theme.colors.accent};
+    color: #fff;
+  }
+  &:active {
+    transform: scale(0.95);
+  }
 `;
 
 const FileList = styled.div`
@@ -126,11 +149,39 @@ const FileExplorer: React.FC = () => {
     });
   };
 
+  const createNewFile = async () => {
+    const name = prompt('Enter file name (e.g., note.txt):');
+    if (!name) return;
+    const targetPath = pathModule.join(currentPath, name);
+    try {
+      await writeFile(targetPath, '');
+      const fileList = await readdir(currentPath);
+      setFiles(fileList);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const createNewFolder = async () => {
+    const name = prompt('Enter folder name:');
+    if (!name) return;
+    const targetPath = pathModule.join(currentPath, name);
+    try {
+      await mkdir(targetPath);
+      const fileList = await readdir(currentPath);
+      setFiles(fileList);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <ExplorerContainer>
       <Toolbar>
-        <button onClick={handleUp}><ArrowLeft size={16}/></button>
+        <IconButton onClick={handleUp} title="Back"><ArrowLeft size={16}/></IconButton>
         <AddressBar value={currentPath} readOnly />
+        <IconButton onClick={createNewFile} title="New File"><FilePlus size={16}/></IconButton>
+        <IconButton onClick={createNewFolder} title="New Folder"><FolderPlus size={16}/></IconButton>
       </Toolbar>
       <FileList data-folder-path={currentPath}>
         {files.map(file => (
@@ -141,11 +192,11 @@ const FileExplorer: React.FC = () => {
           >
              {/* Simple heuristic for icon */}
             {file.endsWith('.project') ? (
-              <Folder size={32} color="#00d8ff" fill="rgba(0, 216, 255, 0.2)" /> 
+              <Folder size={32} color="#D2691E" fill="rgba(210, 105, 30, 0.2)" /> 
             ) : !file.includes('.') ? (
-              <Folder size={32} color="#fcd12a" /> 
+              <Folder size={32} color="#D2691E" /> 
             ) : (
-              <FileText size={32} color="#0078d7" />
+              <FileText size={32} color="#8C7B68" />
             )}
             <FileName>{file}</FileName>
           </FileItem>

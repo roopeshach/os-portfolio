@@ -1,39 +1,39 @@
 import type { DefaultTheme } from 'styled-components';
 
-// Soil/Orange Dark Theme
+// Soft Dark Theme - Elegant Charcoal & Coral
 export const darkTheme: DefaultTheme = {
   colors: {
-    background: '#262421', // Peat
-    taskbar: '#1E1C1A',
-    taskbarHover: '#D2691E', // Chocolate (Soil Orange)
-    startMenu: '#262421',
-    windowBackground: '#262421',
-    text: '#E6DCCF', // Light Sand
-    textSecondary: '#D2691E',
-    accent: '#D2691E', // Chocolate
-    border: '#000000',
-    selection: '#D2691E',
-    hover: '#D2691E',
+    background: '#2D3436', // Soft Charcoal
+    taskbar: '#1E272E',
+    taskbarHover: '#E17055', // Soft Coral
+    startMenu: '#2D3436',
+    windowBackground: '#2D3436',
+    text: '#F5F6FA', // Soft White
+    textSecondary: '#E17055',
+    accent: '#E17055', // Soft Coral
+    border: '#636E72',
+    selection: '#E17055',
+    hover: '#E17055',
   },
   sizes: {
     taskbarHeight: '48px',
   },
 };
 
-// Soil/Orange Light Theme
+// Modern Light Theme - Soft Cream & Coral
 export const lightTheme: DefaultTheme = {
   colors: {
-    background: '#E6DCCF', // Light Sand
-    taskbar: '#E6DCCF',
-    taskbarHover: '#D2691E',
-    startMenu: '#E6DCCF',
-    windowBackground: '#F0EBE5',
-    text: '#1E1C1A',
-    textSecondary: '#8B4513', // SaddleBrown
-    accent: '#D2691E', // Chocolate
-    border: '#000000',
-    selection: '#D2691E',
-    hover: '#D2691E',
+    background: '#FAFAFA', // Soft White
+    taskbar: '#FFFFFF',
+    taskbarHover: '#FF7675', // Light Coral
+    startMenu: '#FFFFFF',
+    windowBackground: '#FFFFFF',
+    text: '#2D3436', // Soft Dark
+    textSecondary: '#E17055', // Soft Coral
+    accent: '#E17055', // Soft Coral
+    border: '#DFE6E9', // Light Gray Border
+    selection: '#FF7675',
+    hover: '#FF7675',
   },
   sizes: {
     taskbarHeight: '48px',

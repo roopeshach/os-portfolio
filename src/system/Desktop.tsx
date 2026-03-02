@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css, keyframes, useTheme } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Taskbar from './Taskbar';
 import WindowManager from './WindowManager';
@@ -16,7 +16,7 @@ const DesktopContainer = styled.div`
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: #000;
+  background: ${props => props.theme.colors.background};
 `;
 
 const DesktopIcons = styled.div`
@@ -42,18 +42,18 @@ const IconWrapper = styled.div`
   cursor: pointer;
   padding: 10px;
   border: 2px solid transparent;
+  border-radius: 12px;
   pointer-events: auto;
   
   &:hover {
-    background: ${props => props.theme.colors.accent};
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0px #000;
-    color: #fff;
+    background: ${props => props.theme.colors.windowBackground};
+    border: 2px solid ${props => props.theme.colors.border};
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
   
   color: ${props => props.theme.colors.text};
   font-weight: bold;
-  transition: all 0.1s;
+  transition: all 0.2s ease;
 `;
 
 const IconLabel = styled.div`
@@ -82,39 +82,53 @@ const GreetingContainer = styled.div`
   justify-content: center;
   z-index: 5;
   pointer-events: none;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 `;
 
 const NameText = styled.h1`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 72px;
+  font-size: 56px;
   font-weight: 900;
   margin: 0;
-  letter-spacing: 2px;
+  letter-spacing: 8px;
   text-transform: uppercase;
-  color: ${props => props.theme.colors.accent};
-  /* Hard shadow for brutalism */
-  text-shadow: 4px 4px 0px #000;
+  color: ${props => props.theme.colors.text};
+  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #FF7675 50%, ${props => props.theme.colors.accent} 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   animation: ${fadeInOut} 4s infinite;
-  -webkit-text-stroke: 1px #000;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, ${props => props.theme.colors.accent}, transparent);
+  }
 `;
 
 const GreetingText = styled.div`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   color: ${props => props.theme.colors.text};
-  background: ${props => props.theme.colors.background};
-  border: 2px solid #000;
-  box-shadow: 4px 4px 0px #000;
-  padding: 5px 15px;
-  margin-top: 10px;
-  min-height: 30px;
+  background: ${props => props.theme.colors.windowBackground};
+  border: 2px solid ${props => props.theme.colors.border};
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 8px 24px;
+  margin-top: 20px;
+  border-radius: 25px;
   animation: ${() => css`${fadeInOut} 4s infinite`};
-  font-weight: 700;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
 `;
 
 const Desktop: React.FC = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [items, setItems] = useState<string[]>([]);
   const [greetingIndex, setGreetingIndex] = useState(0);
   
@@ -227,12 +241,12 @@ const Desktop: React.FC = () => {
 
   const getIcon = (filename: string) => {
     if (filename.includes('.')) {
-      if (filename.endsWith('.link')) return <Globe size={40} color="#D2691E" />;
-      if (filename.endsWith('.txt')) return <FileText size={40} color="#fff" />;
-      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color="#D2691E" />;
-      return <File size={40} color="#fff" />;
+      if (filename.endsWith('.link')) return <Globe size={40} color={theme.colors.accent} />;
+      if (filename.endsWith('.txt')) return <FileText size={40} color={theme.colors.text} />;
+      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color={theme.colors.accent} />;
+      return <File size={40} color={theme.colors.text} />;
     }
-    return <Folder size={40} color="#D2691E" />;
+    return <Folder size={40} color={theme.colors.accent} />;
   };
 
   return (
@@ -248,12 +262,12 @@ const Desktop: React.FC = () => {
       </GreetingContainer>
       <DesktopIcons>
         <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: '/assets/icons/terminal.svg', componentName: 'Terminal' }))}>
-          <Terminal size={40} color="#333" fill="#ccc" />
+          <Terminal size={40} color={theme.colors.accent} />
           <IconLabel>Terminal</IconLabel>
         </IconWrapper>
         
         <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: '/assets/icons/folder.svg', componentName: 'File Explorer' }))}>
-           <Folder size={40} color="#D2691E" />
+           <Folder size={40} color={theme.colors.accent} />
            <IconLabel>This PC</IconLabel>
         </IconWrapper>
 

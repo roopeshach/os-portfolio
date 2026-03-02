@@ -21,7 +21,8 @@ const TaskbarContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   z-index: 9999;
-  border-top: 3px solid #000;
+  border-top: 1px solid ${props => props.theme.colors.border};
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
 `;
 
 const StartButton = styled.div`
@@ -31,14 +32,15 @@ const StartButton = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-right: 3px solid #000;
+  border-right: 1px solid ${props => props.theme.colors.border};
   &:hover {
     background: ${props => props.theme.colors.accent};
   }
   &:active {
-    background: #000;
+    background: ${props => props.theme.colors.accent};
+    opacity: 0.8;
   }
-  transition: background 0.1s;
+  transition: all 0.15s ease;
 `;
 
 const TaskbarItems = styled.div`
@@ -56,7 +58,7 @@ const TaskbarEntry = styled.div<{ $active: boolean }>`
   align-items: center;
   gap: 8px;
   background: ${props => props.$active ? props.theme.colors.accent : 'transparent'};
-  border-right: 3px solid #000;
+  border-right: 1px solid ${props => props.theme.colors.border};
   cursor: pointer;
   font-weight: bold;
   font-size: 13px;
@@ -64,8 +66,9 @@ const TaskbarEntry = styled.div<{ $active: boolean }>`
   
   &:hover {
     background: ${props => props.$active ? props.theme.colors.accent : props.theme.colors.taskbarHover};
+    color: #fff;
   }
-  transition: background 0.1s;
+  transition: all 0.15s ease;
 `;
 
 const Tray = styled.div`
@@ -134,10 +137,10 @@ const Taskbar: React.FC = () => {
       
       <TaskbarContainer>
         <StartButton onClick={() => togglePopup('start')}>
-          <Menu color="#D2691E" style={{ filter: 'drop-shadow(0 0 2px #000)' }} />
+          <Menu size={22} />
         </StartButton>
         <StartButton onClick={() => togglePopup('launchpad')}>
-          <Grid color="#D2691E" style={{ filter: 'drop-shadow(0 0 2px #000)' }} />
+          <Grid size={20} />
         </StartButton>
         <TaskbarItems>
           {Object.values(processes).map(process => (
@@ -160,7 +163,7 @@ const Taskbar: React.FC = () => {
         </TaskbarItems>
         <Tray>
           <TrayIcon onClick={() => togglePopup('info')}>
-             <Info size={18} color="#D2691E" />
+             <Info size={18} />
           </TrayIcon>
 
           <TrayIcon onClick={() => togglePopup('settings')}>

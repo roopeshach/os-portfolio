@@ -24,16 +24,16 @@ const Container = styled.div`
 const UserAvatar = styled.div`
   width: 120px;
   height: 120px;
-  border-radius: 0; /* Brutalist Square */
-  background: ${props => props.theme.colors.windowBackground};
+  border-radius: 50%;
+  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #FF7675 100%);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  border: 3px solid #000;
-  box-shadow: 8px 8px 0px #000;
-  color: ${props => props.theme.colors.text};
+  font-weight: bold;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  color: #fff;
   position: relative;
   z-index: 1;
 `;
@@ -42,36 +42,36 @@ const UserName = styled.h2`
   font-size: 32px;
   margin-bottom: 40px;
   font-weight: 700;
-  text-shadow: 2px 2px 0px #000;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   z-index: 1;
 `;
 
 const EnterButton = styled.button`
-  background: ${props => props.theme.colors.windowBackground};
-  border: 3px solid #000;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   padding: 12px 40px;
-  color: ${props => props.theme.colors.text};
+  color: #fff;
   font-size: 18px;
-  border-radius: 0;
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.1s;
+  transition: all 0.2s ease;
   font-family: 'Rajdhani', sans-serif;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 6px 6px 0px #000;
+  backdrop-filter: blur(10px);
   z-index: 1;
   font-weight: bold;
 
   &:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0px #000;
     background: ${props => props.theme.colors.accent};
-    color: #fff;
+    border-color: ${props => props.theme.colors.accent};
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(225, 112, 85, 0.4);
   }
   &:active {
-    transform: translate(0, 0);
-    box-shadow: 2px 2px 0px #000;
+    transform: translateY(0);
   }
 `;
 
@@ -80,8 +80,8 @@ const TimeDisplay = styled.div`
   bottom: 50px;
   font-size: 64px;
   font-weight: 900;
-  color: ${props => props.theme.colors.text};
-  text-shadow: 4px 4px 0px #000;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
   z-index: 1;
 `;
 
@@ -89,7 +89,7 @@ const DateDisplay = styled.div`
   position: absolute;
   bottom: 30px;
   font-size: 18px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
   z-index: 1;
 `;

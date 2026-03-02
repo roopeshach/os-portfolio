@@ -15,7 +15,7 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 16px;
     font-weight: 500;
     overflow: hidden; /* Prevent body scroll, everything is in desktop */
-    background-color: #000;
+    background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
   }
 

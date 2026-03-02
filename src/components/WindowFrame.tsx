@@ -13,13 +13,13 @@ const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $max
   /* Default position handled by Draggable */
   /* width and height handled by ResizableBox */
   background: ${props => props.theme.colors.windowBackground};
-  /* Neo-Brutalism: No blur, thick borders, hard shadows */
-  border: 3px solid #000000;
-  box-shadow: ${props => props.$active ? '8px 8px 0px #000000' : '4px 4px 0px #000000'};
+  /* Modern soft shadow styling */
+  border: 1px solid ${props => props.theme.colors.border};
+  box-shadow: ${props => props.$active ? '0 8px 32px rgba(0, 0, 0, 0.15)' : '0 4px 16px rgba(0, 0, 0, 0.1)'};
   display: ${props => props.$minimized ? 'none' : 'flex'};
   flex-direction: column;
   z-index: ${props => props.$zIndex};
-  border-radius: 0; /* Sharp corners */
+  border-radius: 12px;
   overflow: hidden;
   
   /* Fix for maximize overriding draggable transform */
@@ -30,11 +30,12 @@ const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $max
     width: 100vw !important;
     height: calc(100vh - 48px) !important; /* Adjusted for taskbar height */
     border: none;
-    border-bottom: 3px solid #000;
+    border-radius: 0;
+    border-bottom: 1px solid ${props.theme.colors.border};
   `}
   
   /* Only transition opacity, width/height transition conflicts with resize */
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, box-shadow 0.2s;
 `;
 
 const TitleBar = styled.div<{ $active: boolean }>`
@@ -45,10 +46,11 @@ const TitleBar = styled.div<{ $active: boolean }>`
   align-items: center;
   padding: 0 12px;
   user-select: none;
-  border-bottom: 3px solid #000000;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
   flex-shrink: 0;
   cursor: grab;
   color: ${props => props.$active ? '#fff' : props.theme.colors.text};
+  border-radius: 12px 12px 0 0;
   
   &:active {
     cursor: grabbing;
@@ -82,20 +84,17 @@ const ControlButton = styled.div<{ type?: 'close' }>`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border: 2px solid #000;
-  background: #fff;
-  color: #000;
-  box-shadow: 2px 2px 0px #000;
-  transition: all 0.1s;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transition: all 0.15s ease;
   
   &:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0px #000;
-    background: ${props => props.type === 'close' ? '#ff4d4d' : '#F3F4EF'};
+    background: ${props => props.type === 'close' ? '#ff5f56' : 'rgba(255, 255, 255, 0.3)'};
+    transform: scale(1.05);
   }
   &:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0px #000;
+    transform: scale(0.95);
   }
 `;
 
