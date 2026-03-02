@@ -14,7 +14,7 @@ const Container = styled.div`
 
 const VideoArea = styled.div`
   flex: 1;
-  background: linear-gradient(135deg, #2D3436 0%, #636E72 100%);
+  background: linear-gradient(135deg, #40251F 0%, #5C3830 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,7 +57,7 @@ const IntroAnimation = ({ playing }: { playing: boolean }) => {
         style={{
           position: 'absolute',
           top: -50, left: -50, right: -50, bottom: -50,
-          backgroundImage: 'linear-gradient(rgba(225, 112, 85, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(225, 112, 85, 0.15) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(206, 217, 121, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(206, 217, 121, 0.15) 1px, transparent 1px)',
           backgroundSize: '50px 50px',
           transform: 'perspective(500px) rotateX(60deg)',
           opacity: 0.4,
@@ -70,10 +70,10 @@ const IntroAnimation = ({ playing }: { playing: boolean }) => {
           animate={playing ? { scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] } : {}}
           transition={{ duration: 5, repeat: Infinity }}
         >
-          <div style={{ fontSize: 60, fontWeight: 700, fontFamily: 'Rajdhani', color: '#E17055', textShadow: '0 0 30px rgba(225, 112, 85, 0.5)' }}>
+          <div style={{ fontSize: 60, fontWeight: 700, fontFamily: 'Rajdhani', color: '#CED979', textShadow: '0 0 30px rgba(206, 217, 121, 0.5)' }}>
             ROOPESH
           </div>
-          <div style={{ fontSize: 24, letterSpacing: 5, opacity: 0.8, color: '#FAFAFA' }}>PORTFOLIO OS</div>
+          <div style={{ fontSize: 24, letterSpacing: 5, opacity: 0.8, color: '#BFBFBF' }}>PORTFOLIO OS</div>
         </motion.div>
       </div>
 
@@ -93,9 +93,9 @@ const IntroAnimation = ({ playing }: { playing: boolean }) => {
             left: `${40 + i * 5}%`,
             width: 4,
             height: 4,
-            background: '#E17055',
+            background: '#CED979',
             borderRadius: '50%',
-            boxShadow: '0 0 10px rgba(225, 112, 85, 0.6)',
+            boxShadow: '0 0 10px rgba(206, 217, 121, 0.6)',
           }}
         />
       ))}

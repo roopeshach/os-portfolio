@@ -25,7 +25,7 @@ const UserAvatar = styled.div`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #FF7675 100%);
+  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #CEB67E 100%);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -33,7 +33,7 @@ const UserAvatar = styled.div`
   font-size: 40px;
   font-weight: bold;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  color: #fff;
+  color: #40251F;
   position: relative;
   z-index: 1;
 `;
@@ -68,7 +68,8 @@ const EnterButton = styled.button`
     background: ${props => props.theme.colors.accent};
     border-color: ${props => props.theme.colors.accent};
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(225, 112, 85, 0.4);
+    box-shadow: 0 8px 25px rgba(206, 217, 121, 0.4);
+    color: #40251F;
   }
   &:active {
     transform: translateY(0);

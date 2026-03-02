@@ -99,7 +99,7 @@ const Input = styled.input`
 
   &:focus {
     border-color: ${props => props.theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(225, 112, 85, 0.2);
+    box-shadow: 0 0 0 3px rgba(206, 217, 121, 0.25);
   }
 
   &::placeholder {
@@ -132,11 +132,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
         return `
           background: ${props.theme.colors.accent};
           border: none;
-          color: #fff;
+          color: #40251F;
           
           &:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(225, 112, 85, 0.4);
+            box-shadow: 0 4px 12px rgba(206, 217, 121, 0.4);
           }
         `;
       case 'danger':

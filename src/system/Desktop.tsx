@@ -93,7 +93,7 @@ const NameText = styled.h1`
   letter-spacing: 8px;
   text-transform: uppercase;
   color: ${props => props.theme.colors.text};
-  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #FF7675 50%, ${props => props.theme.colors.accent} 100%);
+  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #CEB67E 50%, ${props => props.theme.colors.accent} 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

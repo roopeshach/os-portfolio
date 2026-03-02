@@ -12,7 +12,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(45, 52, 54, 0.85);
+  background: rgba(64, 37, 31, 0.9);
   backdrop-filter: blur(20px);
   z-index: 9995;
   display: flex;
@@ -29,22 +29,22 @@ const SearchContainer = styled.div`
 
 const SearchInput = styled.input`
   width: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(191, 191, 191, 0.15);
+  border: 1px solid rgba(191, 191, 191, 0.25);
   padding: 12px 40px;
   border-radius: 25px;
-  color: white;
+  color: #BFBFBF;
   font-size: 16px;
   outline: none;
   
   &::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(191, 191, 191, 0.6);
   }
   
   &:focus {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(191, 191, 191, 0.25);
     border-color: ${props => props.theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(225, 112, 85, 0.3);
+    box-shadow: 0 0 0 3px rgba(206, 217, 121, 0.3);
   }
 `;
 
@@ -71,7 +71,7 @@ const AppIcon = styled(motion.div)`
   }
   
   span {
-    color: white;
+    color: #BFBFBF;
     font-size: 14px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     text-align: center;
