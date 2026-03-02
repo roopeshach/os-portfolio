@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled, { css, keyframes, useTheme } from 'styled-components';
+import styled, { keyframes, useTheme } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Taskbar from './Taskbar';
 import WindowManager from './WindowManager';
@@ -65,16 +65,39 @@ const IconLabel = styled.div`
   line-height: 1.2;
 `;
 
-const fadeInOut = keyframes`
-  0% { opacity: 0; transform: translateY(-20px); }
-  20% { opacity: 1; transform: translateY(0); }
-  80% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(10px); }
+const slideIn = keyframes`
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.95);
+    filter: blur(4px);
+  }
+  15% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  85% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-20px) scale(0.98);
+    filter: blur(2px);
+  }
+`;
+
+const underlineGrow = keyframes`
+  0% { width: 0%; opacity: 0; }
+  20% { width: 60%; opacity: 1; }
+  80% { width: 60%; opacity: 1; }
+  100% { width: 0%; opacity: 0; }
 `;
 
 const GreetingContainer = styled.div`
   position: absolute;
-  top: 10%;
+  bottom: 80px;
   left: 0;
   width: 100%;
   display: flex;
@@ -87,42 +110,62 @@ const GreetingContainer = styled.div`
 
 const NameText = styled.h1`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 56px;
+  font-size: 48px;
   font-weight: 900;
   margin: 0;
-  letter-spacing: 8px;
+  letter-spacing: 6px;
   text-transform: uppercase;
   color: ${props => props.theme.colors.text};
   background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #CEB67E 50%, ${props => props.theme.colors.accent} 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: ${fadeInOut} 4s infinite;
+  animation: ${slideIn} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   position: relative;
   
   &::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, transparent, ${props => props.theme.colors.accent}, transparent);
+    animation: ${underlineGrow} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+`;
+
+const subtitleSlide = keyframes`
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  20% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+  80% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-15px);
   }
 `;
 
 const GreetingText = styled.div`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   color: ${props => props.theme.colors.text};
-  background: ${props => props.theme.colors.windowBackground};
-  border: 2px solid ${props => props.theme.colors.border};
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: ${props => props.theme.colors.windowBackground}dd;
+  border: 1px solid ${props => props.theme.colors.border};
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 8px 24px;
-  margin-top: 20px;
-  border-radius: 25px;
-  animation: ${() => css`${fadeInOut} 4s infinite`};
+  margin-top: 16px;
+  border-radius: 20px;
+  animation: ${subtitleSlide} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 0.15s;
   font-weight: 600;
   backdrop-filter: blur(10px);
 `;
