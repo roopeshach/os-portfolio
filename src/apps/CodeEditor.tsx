@@ -6,6 +6,7 @@ import { Play, Save, X, Plus, Folder, File, ChevronRight, ChevronDown, RefreshCw
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
 import { showAlert } from '../store/systemSlice';
+import { useSystemModal } from '../hooks/useSystemModal';
 
 const Container = styled.div`
   display: flex;
@@ -152,6 +153,7 @@ interface CodeEditorProps {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
   const dispatch = useDispatch();
+  const modal = useSystemModal();
   const [rootPath] = useState('/Users/Roopesh');
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
@@ -299,7 +301,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
   };
 
   const createNewFile = async () => {
-    const name = prompt('Enter file name (e.g., test.js):');
+    const name = await modal.prompt({
+      title: 'New File',
+      message: 'Enter a name for the new file:',
+      placeholder: 'File name',
+      defaultValue: 'untitled.js',
+      confirmText: 'Create',
+    });
     if (!name) return;
     // Default to root or current dir if we tracked it
     const targetPath = pathModule.join(rootPath, name);
@@ -309,7 +317,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
   };
 
   const createNewFolder = async () => {
-    const name = prompt('Enter folder name:');
+    const name = await modal.prompt({
+      title: 'New Folder',
+      message: 'Enter a name for the new folder:',
+      placeholder: 'Folder name',
+      defaultValue: 'New Folder',
+      confirmText: 'Create',
+    });
     if (!name) return;
     const targetPath = pathModule.join(rootPath, name);
     await mkdir(targetPath);

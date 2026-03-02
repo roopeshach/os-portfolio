@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
-import { setShutdown } from '../store/systemSlice';
+import { setShutdown, showModal } from '../store/systemSlice';
 import { AppMetadata } from '../apps/registry';
 import { Power } from 'lucide-react';
+import { registerModalCallback } from './components/SystemModal';
 
 const StartMenuContainer = styled.div`
   position: absolute;
@@ -84,10 +85,21 @@ const StartMenu: React.FC<StartMenuProps> = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const handleShutdown = () => {
-    if (window.confirm('WARNING: All unsaved data will be lost. Are you sure you want to shut down?')) {
-       dispatch(setShutdown(true));
-       onClose();
-    }
+    const callbackId = `shutdown_${Date.now()}`;
+    registerModalCallback(callbackId, (confirmed) => {
+      if (confirmed) {
+        dispatch(setShutdown(true));
+        onClose();
+      }
+    });
+    dispatch(showModal({
+      type: 'confirm',
+      title: 'Shut Down',
+      message: 'All unsaved data will be lost. Are you sure you want to shut down?',
+      confirmText: 'Shut Down',
+      cancelText: 'Cancel',
+      callbackId,
+    }));
   };
 
   const handleLaunch = (appName: string) => {

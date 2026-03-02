@@ -4,6 +4,7 @@ import { readdir, fs, path as pathModule, mkdir, writeFile } from '../system/Fil
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
 import { showAlert } from '../store/systemSlice';
+import { useSystemModal } from '../hooks/useSystemModal';
 import { 
   Folder, FileText, ArrowLeft, FilePlus, FolderPlus
 } from 'lucide-react';
@@ -88,6 +89,7 @@ const FileExplorer: React.FC = () => {
   const [currentPath, setCurrentPath] = useState('/Users/Roopesh');
   const [files, setFiles] = useState<string[]>([]);
   const dispatch = useDispatch();
+  const modal = useSystemModal();
 
   useEffect(() => {
     const loadFiles = async (path: string) => {
@@ -150,7 +152,13 @@ const FileExplorer: React.FC = () => {
   };
 
   const createNewFile = async () => {
-    const name = prompt('Enter file name (e.g., note.txt):');
+    const name = await modal.prompt({
+      title: 'New File',
+      message: 'Enter a name for the new file:',
+      placeholder: 'File name',
+      defaultValue: 'untitled.txt',
+      confirmText: 'Create',
+    });
     if (!name) return;
     const targetPath = pathModule.join(currentPath, name);
     try {
@@ -163,7 +171,13 @@ const FileExplorer: React.FC = () => {
   };
 
   const createNewFolder = async () => {
-    const name = prompt('Enter folder name:');
+    const name = await modal.prompt({
+      title: 'New Folder',
+      message: 'Enter a name for the new folder:',
+      placeholder: 'Folder name',
+      defaultValue: 'New Folder',
+      confirmText: 'Create',
+    });
     if (!name) return;
     const targetPath = pathModule.join(currentPath, name);
     try {

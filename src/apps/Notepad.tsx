@@ -3,6 +3,7 @@ import { readFile, writeFile } from '../system/FileSystem';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
+import { useSystemModal } from '../hooks/useSystemModal';
 
 interface NotepadProps {
   path?: string;
@@ -75,6 +76,7 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
   const [currentPath, setCurrentPath] = useState(path || '');
   const [status, setStatus] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const modal = useSystemModal();
 
   const loadContent = async (filePath: string) => {
     try {
@@ -100,7 +102,13 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
   const handleSave = async () => {
     let targetPath = currentPath;
     if (!targetPath) {
-      const newPath = prompt('Save as path:', '/Users/Roopesh/Documents/Untitled.txt');
+      const newPath = await modal.prompt({
+        title: 'Save As',
+        message: 'Enter the path where you want to save the file:',
+        defaultValue: '/Users/Roopesh/Documents/Untitled.txt',
+        placeholder: 'File path',
+        confirmText: 'Save',
+      });
       if (newPath) {
         targetPath = newPath;
         setCurrentPath(newPath);

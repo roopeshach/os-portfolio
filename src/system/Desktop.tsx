@@ -8,6 +8,7 @@ import { openProcess } from '../store/processSlice';
 import { Folder, Terminal, Globe, FileText, Code, File } from 'lucide-react';
 import type { Stats, ErrnoException } from '../types/filesystem';
 import SystemAlert from './components/SystemAlert';
+import SystemModal from './components/SystemModal';
 import { showAlert } from '../store/systemSlice';
 import FireWallpaper from './components/FireWallpaper';
 
@@ -133,14 +134,12 @@ const Desktop: React.FC = () => {
   const [greetingIndex, setGreetingIndex] = useState(0);
   
   const greetingData = [
-    { name: "ROOPESH ACHARYA", text: "Welcome to my digital space" },
-    { name: "रुपेश आचार्य", text: "मेरो डिजिटल संसारमा स्वागत छ" },
-    { name: "ROOPESH ACHARYA", text: "Explore my projects & skills" },
-    { name: "रुपेश आचार्य", text: "मेरा प्रोजेक्ट र सीपहरु हेर्नुहोस्" },
-    { name: "ROOPESH ACHARYA", text: "Built with React & TypeScript" },
-    { name: "रुपेश आचार्य", text: "रियाक्ट र टाइपस्क्रिप्टमा निर्मित" },
-    { name: "ROOPESH ACHARYA", text: "Enjoy the experience" },
-    { name: "रुपेश आचार्य", text: "अनुभवको आनन्द लिनुहोस्" }
+    { name: "ROOPESH ACHARYA", text: "Software Engineer • Full Stack Developer" },
+    { name: "< Developer />", text: "Building digital experiences with code" },
+    { name: "ROOPESH ACHARYA", text: "React • TypeScript • Node.js • Python" },
+    { name: "{ Creative }", text: "Where design meets functionality" },
+    { name: "ROOPESH ACHARYA", text: "Open source enthusiast & lifelong learner" },
+    { name: "[ Portfolio ]", text: "Explore projects, skills & more →" },
   ];
 
   useEffect(() => {
@@ -285,6 +284,7 @@ const Desktop: React.FC = () => {
       <WindowManager />
       <Taskbar />
       <SystemAlert />
+      <SystemModal />
     </DesktopContainer>
   );
 };

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { openProcess } from '../store/processSlice';
+import { showModal } from '../store/systemSlice';
 import { mkdir, writeFile, unlink, path as pathModule } from './FileSystem';
 import { FolderPlus, FilePlus, Code, Trash2 } from 'lucide-react';
+import { registerModalCallback } from './components/SystemModal';
 
 const Menu = styled.div<{ $x: number; $y: number }>`
   position: fixed;
@@ -96,19 +98,41 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const handleNewFolder = async () => {
     if (!context.targetPath) return;
-    const name = prompt('Folder Name:', 'New Folder');
-    if (name) {
-      await mkdir(pathModule.join(context.targetPath, name));
-    }
+    const callbackId = `ctx_folder_${Date.now()}`;
+    registerModalCallback(callbackId, async (value) => {
+      if (value && typeof value === 'string') {
+        await mkdir(pathModule.join(context.targetPath!, value));
+      }
+    });
+    dispatch(showModal({
+      type: 'prompt',
+      title: 'New Folder',
+      message: 'Enter a name for the new folder:',
+      defaultValue: 'New Folder',
+      placeholder: 'Folder name',
+      confirmText: 'Create',
+      callbackId,
+    }));
     setVisible(false);
   };
 
   const handleNewFile = async () => {
     if (!context.targetPath) return;
-    const name = prompt('File Name:', 'New Text Document.txt');
-    if (name) {
-      await writeFile(pathModule.join(context.targetPath, name), '');
-    }
+    const callbackId = `ctx_file_${Date.now()}`;
+    registerModalCallback(callbackId, async (value) => {
+      if (value && typeof value === 'string') {
+        await writeFile(pathModule.join(context.targetPath!, value), '');
+      }
+    });
+    dispatch(showModal({
+      type: 'prompt',
+      title: 'New File',
+      message: 'Enter a name for the new file:',
+      defaultValue: 'New Text Document.txt',
+      placeholder: 'File name',
+      confirmText: 'Create',
+      callbackId,
+    }));
     setVisible(false);
   };
 
@@ -135,14 +159,25 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const handleDelete = async () => {
     if (context.targetFile) {
-      if (confirm(`Are you sure you want to delete ${pathModule.basename(context.targetFile)}?`)) {
-        try {
-          await unlink(context.targetFile);
-        } catch (e) {
-          console.error(e);
-          alert('Failed to delete file');
+      const fileName = pathModule.basename(context.targetFile);
+      const callbackId = `ctx_delete_${Date.now()}`;
+      registerModalCallback(callbackId, async (confirmed) => {
+        if (confirmed) {
+          try {
+            await unlink(context.targetFile!);
+          } catch (e) {
+            console.error(e);
+          }
         }
-      }
+      });
+      dispatch(showModal({
+        type: 'confirm',
+        title: 'Delete File',
+        message: `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        callbackId,
+      }));
     }
     setVisible(false);
   };
