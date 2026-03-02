@@ -11,9 +11,14 @@ declare module 'styled-components' {
       text: string;
       textSecondary: string;
       accent: string;
+      accentGlow?: string;
       border: string;
       selection: string;
       hover: string;
+      glassBg?: string;
+      glassBlur?: string;
+      shadow?: string;
+      glow?: string;
     };
     sizes: {
       taskbarHeight: string;

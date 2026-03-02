@@ -190,9 +190,42 @@ const TerminalApp: React.FC = () => {
       }
     });
 
+    // Parse command arguments, handling quoted strings with spaces
+    const parseArgs = (input: string): string[] => {
+      const args: string[] = [];
+      let current = '';
+      let inQuote = false;
+      let quoteChar = '';
+      
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        
+        if ((char === '"' || char === "'") && !inQuote) {
+          inQuote = true;
+          quoteChar = char;
+        } else if (char === quoteChar && inQuote) {
+          inQuote = false;
+          quoteChar = '';
+        } else if (char === ' ' && !inQuote) {
+          if (current.length > 0) {
+            args.push(current);
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+      
+      if (current.length > 0) {
+        args.push(current);
+      }
+      
+      return args;
+    };
+
     const processCommand = async (cmd: string) => {
-      const parts = cmd.trim().split(' ');
-      const c = parts[0].toLowerCase();
+      const parts = parseArgs(cmd.trim());
+      const c = parts[0]?.toLowerCase() || '';
       const args = parts.slice(1);
       
       try {

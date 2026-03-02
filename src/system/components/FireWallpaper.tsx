@@ -111,7 +111,10 @@ const FireWallpaper: React.FC = () => {
             return project(x + vx, y + vy, z + vz);
         });
 
-        // Draw
+        // Draw with glow effect
+        ctx.save();
+        ctx.shadowColor = theme.colors.accent;
+        ctx.shadowBlur = 15;
         ctx.strokeStyle = theme.colors.accent; 
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -122,9 +125,18 @@ const FireWallpaper: React.FC = () => {
             ctx.lineTo(p2.x, p2.y);
         });
         ctx.stroke();
+        
+        // Draw again without shadow for crisp lines
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = `${theme.colors.accent}cc`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
 
-        // Fill semi-transparent for "Crystal" look
-        ctx.fillStyle = `${theme.colors.accent}11`; // Very transparent
+        // Fill semi-transparent for "Crystal" look with glow
+        ctx.fillStyle = `${theme.colors.accent}18`; // Slightly more visible
+        ctx.shadowColor = theme.colors.accent;
+        ctx.shadowBlur = 25;
         ctx.beginPath();
         // Simple hull fill for effect (not perfect 3d fill)
         if (projectedVerts.length > 0) {
@@ -136,7 +148,10 @@ const FireWallpaper: React.FC = () => {
     };
 
     const drawGrid = (mx: number, my: number) => {
-       ctx.strokeStyle = theme.colors.textSecondary; 
+       ctx.save();
+       ctx.strokeStyle = `${theme.colors.accent}25`; // Use accent color with transparency
+       ctx.shadowColor = theme.colors.accent;
+       ctx.shadowBlur = 2;
        ctx.lineWidth = 0.5;
        ctx.beginPath();
        
@@ -162,6 +177,7 @@ const FireWallpaper: React.FC = () => {
            ctx.lineTo(p2.x, p2.y);
        }
        ctx.stroke();
+       ctx.restore();
     };
 
     const draw = () => {

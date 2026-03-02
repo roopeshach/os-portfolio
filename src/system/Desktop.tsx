@@ -35,34 +35,69 @@ const DesktopIcons = styled.div`
   pointer-events: none; /* Let clicks pass through if needed, but icons need events */
 `;
 
+const float = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+`;
+
 const IconWrapper = styled.div`
   width: 90px;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  padding: 10px;
+  padding: 12px;
   border: 2px solid transparent;
-  border-radius: 12px;
+  border-radius: 14px;
   pointer-events: auto;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(4px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: radial-gradient(circle at center, ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.2)'} 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
-    background: ${props => props.theme.colors.windowBackground};
-    border: 2px solid ${props => props.theme.colors.border};
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: ${props => props.theme.colors.glassBg || 'rgba(60, 35, 28, 0.5)'};
+    border: 2px solid ${props => props.theme.colors.accent};
+    box-shadow: 0 8px 32px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
+                0 0 20px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.15)'};
+    animation: ${float} 2s ease-in-out infinite;
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    svg {
+      filter: drop-shadow(0 0 8px ${props => props.theme.colors.accent});
+      transform: scale(1.1);
+    }
   }
   
   color: ${props => props.theme.colors.text};
   font-weight: bold;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  svg {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 `;
 
 const IconLabel = styled.div`
   font-size: 12px;
   text-align: center;
-  margin-top: 5px;
+  margin-top: 8px;
   word-break: break-word;
-  line-height: 1.2;
+  line-height: 1.3;
+  text-shadow: 0 1px 4px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.3)'};
+  font-weight: 600;
 `;
 
 const slideIn = keyframes`
@@ -95,9 +130,14 @@ const underlineGrow = keyframes`
   100% { width: 0%; opacity: 0; }
 `;
 
+const pulse = keyframes`
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+`;
+
 const GreetingContainer = styled.div`
   position: absolute;
-  bottom: 80px;
+  bottom: 100px;
   left: 0;
   width: 100%;
   display: flex;
@@ -110,28 +150,56 @@ const GreetingContainer = styled.div`
 
 const NameText = styled.h1`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 900;
   margin: 0;
-  letter-spacing: 6px;
+  letter-spacing: 8px;
   text-transform: uppercase;
   color: ${props => props.theme.colors.text};
-  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #CEB67E 50%, ${props => props.theme.colors.accent} 100%);
+  background: linear-gradient(135deg, 
+    ${props => props.theme.colors.accent} 0%, 
+    #fff 25%,
+    #CEB67E 50%, 
+    #fff 75%,
+    ${props => props.theme.colors.accent} 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: ${slideIn} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   position: relative;
+  text-shadow: none;
+  filter: drop-shadow(0 0 30px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.5)'});
+  
+  &::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: blur(20px);
+    opacity: 0.5;
+    animation: ${pulse} 3s ease-in-out infinite;
+  }
   
   &::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
-    height: 2px;
-    background: linear-gradient(90deg, transparent, ${props => props.theme.colors.accent}, transparent);
+    height: 3px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      ${props => props.theme.colors.accent}, 
+      #fff,
+      ${props => props.theme.colors.accent}, 
+      transparent);
     animation: ${underlineGrow} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    border-radius: 2px;
+    box-shadow: 0 0 20px ${props => props.theme.colors.accent};
   }
 `;
 
@@ -154,20 +222,43 @@ const subtitleSlide = keyframes`
   }
 `;
 
+const shimmer = keyframes`
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+`;
+
 const GreetingText = styled.div`
   font-family: 'Rajdhani', sans-serif;
   font-size: 16px;
   color: ${props => props.theme.colors.text};
-  background: ${props => props.theme.colors.windowBackground}dd;
+  background: ${props => props.theme.colors.glassBg || 'rgba(60, 35, 28, 0.6)'};
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  padding: 8px 24px;
-  margin-top: 16px;
-  border-radius: 20px;
+  box-shadow: 0 8px 32px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
+              0 0 40px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.1)'},
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 10px 28px;
+  margin-top: 20px;
+  border-radius: 25px;
   animation: ${subtitleSlide} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   animation-delay: 0.15s;
   font-weight: 600;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.1) 50%, 
+      transparent 100%);
+    background-size: 200% 100%;
+    animation: ${shimmer} 3s linear infinite;
+  }
 `;
 
 const Desktop: React.FC = () => {

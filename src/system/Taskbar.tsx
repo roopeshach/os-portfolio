@@ -17,30 +17,50 @@ const TaskbarContainer = styled.div`
   width: 100%;
   height: ${props => props.theme.sizes.taskbarHeight};
   background: ${props => props.theme.colors.taskbar};
+  backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
+  -webkit-backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 9999;
   border-top: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -4px 30px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
 `;
 
 const StartButton = styled.div`
-  width: 48px;
+  width: 52px;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   border-right: 1px solid ${props => props.theme.colors.border};
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.3)'} 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
   &:hover {
     background: ${props => props.theme.colors.accent};
+    box-shadow: 0 0 20px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.5)'};
+    
+    &::before {
+      opacity: 1;
+    }
   }
   &:active {
     background: ${props => props.theme.colors.accent};
-    opacity: 0.8;
+    transform: scale(0.95);
   }
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const TaskbarItems = styled.div`
@@ -50,25 +70,56 @@ const TaskbarItems = styled.div`
 `;
 
 const TaskbarEntry = styled.div<{ $active: boolean }>`
-  width: 160px;
-  height: 100%;
+  width: 180px;
+  height: calc(100% - 8px);
+  margin: 4px 4px 4px 0;
   display: flex;
-  padding: 0 10px;
+  padding: 0 12px;
   justify-content: flex-start;
   align-items: center;
-  gap: 8px;
-  background: ${props => props.$active ? props.theme.colors.accent : 'transparent'};
-  border-right: 1px solid ${props => props.theme.colors.border};
+  gap: 10px;
+  background: ${props => props.$active 
+    ? `linear-gradient(135deg, ${props.theme.colors.accent} 0%, ${props.theme.colors.hover} 100%)`
+    : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$active 
+    ? props.theme.colors.accent 
+    : 'transparent'};
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 13px;
-  color: ${props => props.$active ? '#fff' : props.theme.colors.text};
+  color: ${props => props.$active ? '#1a1a1a' : props.theme.colors.text};
+  position: relative;
+  overflow: hidden;
+  
+  ${props => props.$active && `
+    box-shadow: 0 2px 12px ${props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.4)'},
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  `}
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: ${props => props.$active ? '40%' : '0'};
+    height: 2px;
+    background: ${props => props.theme.colors.accent};
+    border-radius: 1px;
+    transition: width 0.3s ease;
+  }
   
   &:hover {
-    background: ${props => props.$active ? props.theme.colors.accent : props.theme.colors.taskbarHover};
-    color: #fff;
+    background: ${props => props.$active 
+      ? `linear-gradient(135deg, ${props.theme.colors.accent} 0%, ${props.theme.colors.hover} 100%)`
+      : 'rgba(255, 255, 255, 0.1)'};
+    
+    &::after {
+      width: 60%;
+    }
   }
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const Tray = styled.div`
@@ -82,15 +133,26 @@ const Tray = styled.div`
 
 const TrayIcon = styled.div`
   cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  &:hover {
-    background: ${props => props.theme.colors.taskbarHover};
-  }
+  padding: 10px;
+  border-radius: 8px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    
+    svg {
+      filter: drop-shadow(0 0 8px ${props => props.theme.colors.accent});
+    }
+  }
+  
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
 `;
 
 const Clock = ({ onClick }: { onClick: () => void }) => {

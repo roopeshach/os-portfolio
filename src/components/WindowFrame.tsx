@@ -10,54 +10,64 @@ import { X, Minus, Square, Copy } from 'lucide-react';
 
 const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $maximized: boolean; $zIndex: number }>`
   position: absolute;
-  /* Default position handled by Draggable */
-  /* width and height handled by ResizableBox */
   background: ${props => props.theme.colors.windowBackground};
-  /* Modern soft shadow styling */
-  border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: ${props => props.$active ? '0 8px 32px rgba(0, 0, 0, 0.15)' : '0 4px 16px rgba(0, 0, 0, 0.1)'};
+  backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
+  -webkit-backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
+  border: 1px solid ${props => props.$active 
+    ? props.theme.colors.accent 
+    : props.theme.colors.border};
+  box-shadow: ${props => props.$active 
+    ? `0 12px 40px ${props.theme.colors.shadow || 'rgba(0, 0, 0, 0.3)'}, 
+       0 0 0 1px ${props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.2)'},
+       inset 0 1px 0 rgba(255, 255, 255, 0.08)` 
+    : `0 6px 24px ${props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
+       inset 0 1px 0 rgba(255, 255, 255, 0.05)`};
   display: ${props => props.$minimized ? 'none' : 'flex'};
   flex-direction: column;
   z-index: ${props => props.$zIndex};
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   
-  /* Fix for maximize overriding draggable transform */
   ${props => props.$maximized && `
     transform: translate(0, 0) !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - 48px) !important; /* Adjusted for taskbar height */
+    height: calc(100vh - ${props.theme.sizes.taskbarHeight}) !important;
     border: none;
     border-radius: 0;
     border-bottom: 1px solid ${props.theme.colors.border};
   `}
   
-  /* Only transition opacity, width/height transition conflicts with resize */
-  transition: opacity 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const TitleBar = styled.div<{ $active: boolean }>`
-  height: 36px;
-  background: ${props => props.$active ? props.theme.colors.accent : props.theme.colors.background};
+  height: 40px;
+  background: ${props => props.$active 
+    ? props.theme.colors.accent
+    : props.theme.colors.windowBackground};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 14px;
   user-select: none;
-  border-bottom: 1px solid ${props => props.theme.colors.border};
+  border-bottom: 1px solid ${props => props.$active 
+    ? 'rgba(0, 0, 0, 0.1)' 
+    : props.theme.colors.border};
   flex-shrink: 0;
   cursor: grab;
-  color: ${props => props.$active ? '#fff' : props.theme.colors.text};
-  border-radius: 12px 12px 0 0;
+  border-radius: 14px 14px 0 0;
+  position: relative;
+  overflow: hidden;
   
   &:active {
     cursor: grabbing;
   }
 `;
 
-const Title = styled.div`
+const Title = styled.div<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 10px;
@@ -66,8 +76,12 @@ const Title = styled.div`
   font-weight: 600;
   letter-spacing: 0.5px;
   flex-grow: 1;
-  color: ${props => props.theme.colors.text};
+  color: ${props => props.$active ? '#2A1810' : props.theme.colors.text};
   text-transform: uppercase;
+  
+  svg {
+    color: ${props => props.$active ? '#2A1810' : props.theme.colors.accent};
+  }
 `;
 
 const Controls = styled.div`
@@ -77,24 +91,29 @@ const Controls = styled.div`
   gap: 8px;
 `;
 
-const ControlButton = styled.div<{ type?: 'close' }>`
-  width: 24px;
-  height: 24px;
+const ControlButton = styled.div<{ type?: 'close'; $active?: boolean }>`
+  width: 26px;
+  height: 26px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  transition: all 0.15s ease;
+  border-radius: 8px;
+  background: ${props => props.$active 
+    ? 'rgba(0, 0, 0, 0.15)' 
+    : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.$active ? '#2A1810' : props.theme.colors.text};
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:hover {
-    background: ${props => props.type === 'close' ? '#ff5f56' : 'rgba(255, 255, 255, 0.3)'};
-    transform: scale(1.05);
+    background: ${props => props.type === 'close' 
+      ? '#e74c3c' 
+      : props.$active ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.2)'};
+    color: ${props => props.type === 'close' ? '#fff' : props.$active ? '#2A1810' : '#fff'};
+    transform: scale(1.1);
   }
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
 `;
 
@@ -198,18 +217,18 @@ const WindowFrame: React.FC<WindowFrameProps> = ({ id, title, icon, children }) 
         >
            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <TitleBar className="title-bar" $active={isActive}>
-              <Title>
+              <Title $active={isActive}>
                  <img src={icon} alt="" style={{width: 16, height: 16, display: icon ? 'block' : 'none'}} onError={(e) => e.currentTarget.style.display = 'none'}/> 
                  {title}
               </Title>
               <Controls>
-                <ControlButton onClick={(e) => { e.stopPropagation(); dispatch(minimizeProcess(id)); }}>
+                <ControlButton $active={isActive} onClick={(e) => { e.stopPropagation(); dispatch(minimizeProcess(id)); }}>
                   <Minus size={14} />
                 </ControlButton>
-                <ControlButton onClick={(e) => { e.stopPropagation(); dispatch(maximizeProcess(id)); }}>
+                <ControlButton $active={isActive} onClick={(e) => { e.stopPropagation(); dispatch(maximizeProcess(id)); }}>
                   {process.maximized ? <Copy size={12} /> : <Square size={12} />}
                 </ControlButton>
-                <ControlButton type="close" onClick={(e) => { e.stopPropagation(); dispatch(closeProcess(id)); }}>
+                <ControlButton $active={isActive} type="close" onClick={(e) => { e.stopPropagation(); dispatch(closeProcess(id)); }}>
                   <X size={14} />
                 </ControlButton>
               </Controls>
