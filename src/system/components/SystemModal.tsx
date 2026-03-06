@@ -24,8 +24,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 100001;
   display: flex;
   align-items: center;
@@ -34,27 +33,27 @@ const Overlay = styled(motion.div)`
 
 const ModalBox = styled(motion.div)`
   width: 420px;
-  background: ${props => props.theme.colors.windowBackground};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 4px solid #000;
+  box-shadow: 8px 8px 0 #000;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 `;
 
 const ModalHeader = styled.div`
-  height: 44px;
-  background: ${props => props.theme.colors.accent};
+  height: 48px;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
   display: flex;
   align-items: center;
   padding: 0 16px;
   gap: 10px;
   font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 15px;
   letter-spacing: 0.5px;
-  color: #fff;
+  color: #000;
+  border-bottom: 3px solid #000;
 `;
 
 const ModalContent = styled.div`
@@ -62,13 +61,14 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  color: ${props => props.theme.colors.text};
+  color: #000;
 `;
 
 const Message = styled.div`
   font-size: 14px;
   line-height: 1.6;
-  color: ${props => props.theme.colors.text};
+  color: #000;
+  font-weight: 600;
 `;
 
 const InputWrapper = styled.div`
@@ -79,8 +79,8 @@ const InputWrapper = styled.div`
 
 const Label = styled.label`
   font-size: 12px;
-  font-weight: 600;
-  color: ${props => props.theme.colors.textSecondary};
+  font-weight: 800;
+  color: #000;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
@@ -88,23 +88,23 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 12px 14px;
-  background: ${props => props.theme.colors.background};
-  border: 2px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
-  color: ${props => props.theme.colors.text};
+  background: #fff;
+  border: 3px solid #000;
+  color: #000;
   font-size: 14px;
   font-family: 'Fira Code', monospace;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
+  font-weight: 500;
 
   &:focus {
-    border-color: ${props => props.theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(206, 217, 121, 0.25);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #000;
   }
 
   &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-    opacity: 0.6;
+    color: #666;
+    opacity: 0.8;
   }
 `;
 
@@ -113,51 +113,44 @@ const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  background: ${props => props.theme.colors.background};
-  border-top: 1px solid ${props => props.theme.colors.border};
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border-top: 3px solid #000;
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
   padding: 10px 24px;
-  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   font-family: 'Rajdhani', sans-serif;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
+  border: 3px solid #000;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
   
   ${props => {
     switch (props.$variant) {
       case 'primary':
         return `
-          background: ${props.theme.colors.accent};
-          border: none;
-          color: #40251F;
+          background: ${props.theme.colors.brutalistPink || '#ff6b9d'};
           
           &:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(206, 217, 121, 0.4);
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
           }
         `;
       case 'danger':
         return `
           background: #ff5f56;
-          border: none;
-          color: #fff;
           
           &:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 95, 86, 0.4);
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
           }
         `;
       default:
         return `
-          background: transparent;
-          border: 1px solid ${props.theme.colors.border};
-          color: ${props.theme.colors.text};
-          
-          &:hover {
-            background: ${props.theme.colors.background};
+          background: #fff;
             border-color: ${props.theme.colors.textSecondary};
           }
         `;

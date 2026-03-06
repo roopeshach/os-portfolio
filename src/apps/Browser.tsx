@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ArrowLeft, ArrowRight, RotateCw, Plus, X, ExternalLink, Home } from 'lucide-react';
 
@@ -6,24 +6,26 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f0f0f0;
-  color: #333;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
 `;
 
 const TabBar = styled.div`
   display: flex;
-  background: #dfe1e5;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
   padding: 8px 8px 0 8px;
   gap: 4px;
   align-items: center;
   overflow-x: auto;
+  border-bottom: 3px solid #000;
   &::-webkit-scrollbar { height: 0; }
 `;
 
 const Tab = styled.div<{ $active: boolean }>`
   padding: 8px 12px;
-  background: ${props => props.$active ? '#fff' : 'transparent'};
-  border-radius: 8px 8px 0 0;
+  background: ${props => props.$active ? props.theme.colors.brutalistGreen || '#6bcb77' : props.theme.colors.brutalistPink || '#ff6b9d'};
+  border: 3px solid #000;
+  border-bottom: ${props => props.$active ? 'none' : '3px solid #000'};
   font-size: 12px;
   max-width: 200px;
   min-width: 100px;
@@ -32,11 +34,13 @@ const Tab = styled.div<{ $active: boolean }>`
   gap: 8px;
   cursor: pointer;
   position: relative;
-  box-shadow: ${props => props.$active ? '0 -1px 4px rgba(0,0,0,0.1)' : 'none'};
-  transition: background 0.2s;
+  font-weight: 700;
+  color: #000;
+  box-shadow: ${props => props.$active ? 'none' : '2px 2px 0 #000'};
+  transition: all 0.1s;
   
   &:hover {
-    background: ${props => props.$active ? '#fff' : '#e6e8eb'};
+    transform: ${props => props.$active ? 'none' : 'translate(-1px, -1px)'};
   }
 `;
 
@@ -45,23 +49,28 @@ const TabTitle = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #000;
 `;
 
 const CloseTab = styled.div`
   padding: 2px;
-  border-radius: 50%;
   display: flex;
-  &:hover { background: #ccc; }
+  &:hover { background: rgba(0,0,0,0.2); }
+  color: #000;
 `;
 
 const NewTabButton = styled.button`
-  background: none;
-  border: none;
+  background: ${props => props.theme.colors.brutalistOrange || '#ff9f43'};
+  border: 3px solid #000;
   padding: 4px;
-  border-radius: 50%;
   cursor: pointer;
   display: flex;
-  &:hover { background: #ccc; }
+  box-shadow: 2px 2px 0 #000;
+  color: #000;
+  &:hover { 
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+  }
 `;
 
 const Toolbar = styled.div`
@@ -69,45 +78,49 @@ const Toolbar = styled.div`
   gap: 8px;
   padding: 8px;
   background: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 3px solid #000;
   align-items: center;
 `;
 
 const AddressBar = styled.input`
   flex: 1;
   padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
+  border: 3px solid #000;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  font-family: 'Rajdhani', sans-serif;
   outline: none;
   font-size: 14px;
-  background: #f1f3f4;
-  color: #333;
-  transition: all 0.2s;
+  transition: all 0.1s;
   
   &:focus {
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-color: #4285f4;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
   }
 `;
 
 const IconButton = styled.button`
-  background: none;
-  border: none;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border: 3px solid #000;
   cursor: pointer;
   padding: 6px;
-  border-radius: 50%;
-  color: #5f6368;
+  color: #000;
   display: flex;
   align-items: center;
-  &:hover { background: #eee; color: #333; }
-  &:disabled { opacity: 0.3; cursor: default; }
+  box-shadow: 2px 2px 0 #000;
+  &:hover { 
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+  }
+  &:disabled { opacity: 0.3; cursor: default; transform: none; box-shadow: 2px 2px 0 #000; }
 `;
 
 const BrowserContent = styled.div`
   flex: 1;
   position: relative;
   background: #fff;
+  border: 3px solid #000;
 `;
 
 const IframeContainer = styled.div<{ $active: boolean }>`
@@ -120,18 +133,6 @@ const Iframe = styled.iframe`
   width: 100%;
   height: 100%;
   border: none;
-`;
-
-const ErrorOverlay = styled.div`
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  z-index: 10;
-  gap: 20px;
 `;
 
 interface TabData {

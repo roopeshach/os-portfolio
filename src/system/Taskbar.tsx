@@ -17,50 +17,39 @@ const TaskbarContainer = styled.div`
   width: 100%;
   height: ${props => props.theme.sizes.taskbarHeight};
   background: ${props => props.theme.colors.taskbar};
-  backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
-  -webkit-backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 9999;
-  border-top: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 -4px 30px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
-              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-top: 3px solid ${props => props.theme.colors.border};
+  box-shadow: 0 -4px 0 ${props => props.theme.colors.border};
 `;
 
 const StartButton = styled.div`
-  width: 52px;
-  height: 100%;
+  width: 56px;
+  height: calc(100% - 12px);
+  margin: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-right: 1px solid ${props => props.theme.colors.border};
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.3)'} 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
   
   &:hover {
-    background: ${props => props.theme.colors.accent};
-    box-shadow: 0 0 20px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.5)'};
-    
-    &::before {
-      opacity: 1;
-    }
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
   }
   &:active {
-    background: ${props => props.theme.colors.accent};
-    transform: scale(0.95);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
   }
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.1s ease;
+  
+  svg {
+    color: #000;
+  }
 `;
 
 const TaskbarItems = styled.div`
@@ -70,56 +59,36 @@ const TaskbarItems = styled.div`
 `;
 
 const TaskbarEntry = styled.div<{ $active: boolean }>`
-  width: 180px;
-  height: calc(100% - 8px);
-  margin: 4px 4px 4px 0;
+  min-width: 160px;
+  height: calc(100% - 12px);
+  margin: 6px 0 6px 6px;
   display: flex;
-  padding: 0 12px;
+  padding: 0 14px;
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
   background: ${props => props.$active 
-    ? `linear-gradient(135deg, ${props.theme.colors.accent} 0%, ${props.theme.colors.hover} 100%)`
-    : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$active 
-    ? props.theme.colors.accent 
-    : 'transparent'};
-  border-radius: 8px;
+    ? (props.theme.colors.brutalistGreen || '#6bcb77')
+    : (props.theme.colors.brutalistBlue || '#4d96ff')};
+  border: 3px solid #000;
+  box-shadow: ${props => props.$active ? '4px 4px 0 #000' : '2px 2px 0 #000'};
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 13px;
-  color: ${props => props.$active ? '#1a1a1a' : props.theme.colors.text};
-  position: relative;
-  overflow: hidden;
-  
-  ${props => props.$active && `
-    box-shadow: 0 2px 12px ${props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.4)'},
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  `}
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: ${props => props.$active ? '40%' : '0'};
-    height: 2px;
-    background: ${props => props.theme.colors.accent};
-    border-radius: 1px;
-    transition: width 0.3s ease;
-  }
+  font-family: 'Rajdhani', sans-serif;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   
   &:hover {
-    background: ${props => props.$active 
-      ? `linear-gradient(135deg, ${props.theme.colors.accent} 0%, ${props.theme.colors.hover} 100%)`
-      : 'rgba(255, 255, 255, 0.1)'};
-    
-    &::after {
-      width: 60%;
-    }
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
   }
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
+  }
+  transition: all 0.1s ease;
 `;
 
 const Tray = styled.div`
@@ -133,25 +102,27 @@ const Tray = styled.div`
 
 const TrayIcon = styled.div`
   cursor: pointer;
-  padding: 10px;
-  border-radius: 8px;
-  position: relative;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.1s ease;
   
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-    
-    svg {
-      filter: drop-shadow(0 0 8px ${props => props.theme.colors.accent});
-    }
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
   }
   
   &:active {
-    transform: translateY(0) scale(0.95);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+  
+  svg {
+    color: #000;
   }
 `;
 

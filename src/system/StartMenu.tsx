@@ -9,19 +9,17 @@ import { registerModalCallback } from './components/SystemModal';
 
 const StartMenuContainer = styled.div`
   position: absolute;
-  bottom: 48px; /* Taskbar height */
-  left: 0;
+  bottom: 56px; /* Taskbar height */
+  left: 10px;
   width: 350px;
   height: 500px;
-  background: ${props => props.theme.colors.startMenu};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-bottom: none;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
-  border-radius: 12px 12px 0 0;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 3px solid #000;
+  box-shadow: 8px 8px 0 #000;
   display: flex;
   flex-direction: row;
   z-index: 9998;
-  animation: slideUp 0.2s ease-out;
+  animation: slideUp 0.15s ease-out;
 
   @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
@@ -37,6 +35,8 @@ const Sidebar = styled.div`
   justify-content: flex-end;
   align-items: center;
   padding-bottom: 10px;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border-right: 3px solid #000;
 `;
 
 const AppList = styled.div`
@@ -50,18 +50,24 @@ const AppEntry = styled.div`
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 8px;
+  border: 3px solid #000;
   gap: 10px;
-  color: ${props => props.theme.colors.text};
-  font-weight: 600;
+  color: #000;
+  font-weight: 700;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  margin-bottom: 8px;
+  box-shadow: 3px 3px 0 #000;
   
   &:hover {
-    background: ${props => props.theme.colors.hover};
-    border: 2px solid ${props => props.theme.colors.border};
-    color: #fff;
+    background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
   }
-  transition: all 0.15s ease;
+  transition: all 0.1s ease;
+  
+  svg {
+    color: #000;
+  }
 `;
 
 const PowerButton = styled.div`
@@ -71,9 +77,14 @@ const PowerButton = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-radius: 4px;
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  border: 3px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  color: #000;
+  
   &:hover {
-    background: ${props => props.theme.colors.hover};
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
   }
 `;
 

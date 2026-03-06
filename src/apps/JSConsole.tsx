@@ -6,49 +6,54 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   font-family: 'Fira Code', monospace;
 `;
 
 const Toolbar = styled.div`
   padding: 8px;
-  background: #252526;
-  border-bottom: 1px solid #333;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border-bottom: 3px solid #000;
   display: flex;
   gap: 10px;
   align-items: center;
 `;
 
 const Button = styled.button`
-  background: ${props => props.theme.colors.accent};
-  color: white;
-  border: none;
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  color: #000;
+  border: 3px solid #000;
   padding: 6px 12px;
-  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  &:hover { opacity: 0.9; }
+  font-weight: 700;
+  box-shadow: 2px 2px 0 #000;
+  &:hover { 
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+  }
 `;
 
 const Warning = styled.div`
-  background: rgba(255, 165, 0, 0.1);
-  color: orange;
+  background: ${props => props.theme.colors.brutalistOrange || '#ff9f43'};
+  color: #000;
   font-size: 11px;
   padding: 4px 8px;
-  border-radius: 4px;
+  border: 2px solid #000;
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 700;
 `;
 
 const Editor = styled.textarea`
   flex: 1;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: #fff;
+  color: #000;
   border: none;
   resize: none;
   padding: 10px;
@@ -56,15 +61,17 @@ const Editor = styled.textarea`
   font-size: 14px;
   line-height: 1.5;
   outline: none;
+  font-weight: 500;
 `;
 
 const Output = styled.div`
   height: 150px;
-  background: #000;
-  border-top: 1px solid #333;
+  background: #1a1a2e;
+  border-top: 3px solid #000;
   padding: 10px;
   overflow-y: auto;
   font-size: 13px;
+  color: #fff;
 `;
 
 const LogLine = styled.div<{ type: 'log' | 'error' | 'warn' }>`

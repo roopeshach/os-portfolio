@@ -8,17 +8,16 @@ import { openProcess } from '../../../store/processSlice';
 
 const PopupContainer = styled.div`
   position: absolute;
-  bottom: 60px;
+  bottom: 65px;
   right: 10px;
   width: 320px;
-  background: ${props => props.theme.colors.windowBackground};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
   border: 3px solid #000;
-  border-radius: 0;
   padding: 16px;
-  box-shadow: 8px 8px 0px #000;
+  box-shadow: 6px 6px 0 #000;
   z-index: 10000;
-  color: ${props => props.theme.colors.text};
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #000;
+  animation: slideUp 0.15s ease-out;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -33,8 +32,9 @@ const SectionTitle = styled.div`
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: #000;
   margin-bottom: 8px;
+  font-weight: 800;
 `;
 
 const Grid = styled.div`
@@ -44,9 +44,8 @@ const Grid = styled.div`
 `;
 
   const Tile = styled.div<{ active?: boolean }>`
-  background: ${props => props.active ? props.theme.colors.accent : '#fff'};
-  border: 2px solid #000;
-  border-radius: 0;
+  background: ${props => props.active ? (props.theme.colors.brutalistPink || '#ff6b9d') : (props.theme.colors.brutalistGreen || '#6bcb77')};
+  border: 3px solid #000;
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -54,57 +53,66 @@ const Grid = styled.div`
   gap: 8px;
   cursor: pointer;
   transition: all 0.1s;
-  color: ${props => props.active ? '#fff' : '#000'};
-  box-shadow: 4px 4px 0px #000;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
   
   &:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #000;
+    box-shadow: 5px 5px 0 #000;
   }
   &:active {
-    transform: translate(0, 0);
-    box-shadow: 2px 2px 0px #000;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
+  
+  svg {
+    color: #000;
   }
 `;
 
 const TileLabel = styled.span`
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #000;
 `;
 
 const SliderRow = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  
+  svg {
+    color: #000;
+  }
 `;
 
 const Slider = styled.input`
   flex: 1;
-  height: 4px;
-  border-radius: 2px;
+  height: 8px;
   -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.2);
+  background: #fff;
+  border: 3px solid #000;
   
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: ${props => props.theme.colors.accent};
+    width: 20px;
+    height: 20px;
+    background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
     cursor: pointer;
-    box-shadow: 0 0 10px ${props => props.theme.colors.accent};
+    border: 3px solid #000;
   }
 `;
 
 const ConnectionInfo = styled.div`
   font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: ${props => props.theme.colors.accent};
-  background: rgba(0, 0, 0, 0.3);
+  color: #000;
+  background: #fff;
   padding: 8px;
-  border-radius: 4px;
+  border: 2px solid #000;
   display: flex;
   justify-content: space-between;
+  font-weight: 700;
 `;
 
 const QuickSettingsPopup: React.FC = () => {
@@ -136,7 +144,7 @@ const QuickSettingsPopup: React.FC = () => {
         <SectionTitle>Connectivity</SectionTitle>
         <Grid>
           <Tile active>
-            <Wifi size={20} color="#D2691E" />
+            <Wifi size={20} />
             <TileLabel>CyberNet_5G</TileLabel>
           </Tile>
           {/* Removed Bluetooth as requested */}
@@ -182,12 +190,12 @@ const QuickSettingsPopup: React.FC = () => {
         </div>
       </div>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, color: '#000', fontWeight: 700 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
           <Battery size={16} />
           <span>100%</span>
         </div>
-        <div style={{ fontSize: 10, color: '#aaa' }}>EST. 4h 20m</div>
+        <div style={{ fontSize: 10, color: '#000' }}>EST. 4h 20m</div>
       </div>
     </PopupContainer>
   );

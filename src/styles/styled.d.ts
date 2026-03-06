@@ -19,6 +19,13 @@ declare module 'styled-components' {
       glassBlur?: string;
       shadow?: string;
       glow?: string;
+      // Neubrutalism colors
+      brutalistYellow?: string;
+      brutalistBlue?: string;
+      brutalistPink?: string;
+      brutalistGreen?: string;
+      brutalistOrange?: string;
+      brutalistPurple?: string;
     };
     sizes: {
       taskbarHeight: string;

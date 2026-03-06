@@ -12,8 +12,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 100000;
   display: flex;
   align-items: center;
@@ -22,27 +21,26 @@ const Overlay = styled(motion.div)`
 
 const AlertBox = styled(motion.div)`
   width: 400px;
-  background: rgba(10, 15, 30, 0.95);
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 4px solid #000;
+  box-shadow: 8px 8px 0 #000;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 `;
 
 const AlertHeader = styled.div`
-  height: 40px;
-  background: rgba(255, 255, 255, 0.05);
+  height: 45px;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
   display: flex;
   align-items: center;
   padding: 0 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid #000;
   font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: ${props => props.theme.colors.text};
+  color: #000;
 `;
 
 const AlertContent = styled.div`
@@ -50,24 +48,29 @@ const AlertContent = styled.div`
   display: flex;
   gap: 20px;
   align-items: flex-start;
-  color: ${props => props.theme.colors.text};
+  color: #000;
 `;
 
 const IconWrapper = styled.div<{ type: string }>`
-  color: ${props => {
+  color: #000;
+  background: ${props => {
     switch(props.type) {
-      case 'error': return '#ff4d4d';
-      case 'warning': return '#ffa726';
-      case 'success': return '#66bb6a';
-      default: return '#00d8ff';
+      case 'error': return '#ff6b9d';
+      case 'warning': return '#ff9f43';
+      case 'success': return '#6bcb77';
+      default: return '#4d96ff';
     }
   }};
+  padding: 8px;
+  border: 3px solid #000;
 `;
 
 const Message = styled.div`
   flex: 1;
   font-size: 14px;
   line-height: 1.5;
+  font-weight: 600;
+  color: #000;
 `;
 
 const ButtonGroup = styled.div`
@@ -75,32 +78,37 @@ const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  background: rgba(0, 0, 0, 0.2);
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border-top: 3px solid #000;
 `;
 
 const Button = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border: 3px solid #000;
+  color: #000;
   padding: 8px 20px;
-  border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  transition: all 0.2s;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 #000;
+  transition: all 0.1s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: ${props => props.theme.colors.accent};
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+  }
+  
+  &:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
   }
 
   &.primary {
-    background: ${props => props.theme.colors.accent};
-    color: black;
-    font-weight: 600;
+    background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
     
     &:hover {
-      opacity: 0.9;
-      box-shadow: 0 0 10px ${props => props.theme.colors.accent};
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
     }
   }
 `;

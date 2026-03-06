@@ -6,8 +6,8 @@ import { Code } from 'lucide-react';
 
 const Container = styled.div`
   height: 100%;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   overflow-y: auto;
   padding: 40px;
   display: flex;
@@ -25,17 +25,22 @@ const HeroSection = styled.div`
 const Title = styled(motion.h1)`
   font-size: 48px;
   margin-bottom: 10px;
-  background: linear-gradient(90deg, #fff, ${props => props.theme.colors.accent});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #000;
   font-family: 'Rajdhani', sans-serif;
   text-transform: uppercase;
+  font-weight: 900;
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  padding: 10px 30px;
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  display: inline-block;
 `;
 
 const Tagline = styled(motion.div)`
   font-size: 18px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: #000;
   margin-bottom: 20px;
+  font-weight: 700;
 `;
 
 const TagContainer = styled(motion.div)`
@@ -46,34 +51,35 @@ const TagContainer = styled(motion.div)`
 `;
 
 const Tag = styled.span`
-  background: rgba(0, 216, 255, 0.1);
-  border: 1px solid rgba(0, 216, 255, 0.3);
-  color: ${props => props.theme.colors.accent};
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border: 3px solid #000;
+  color: #000;
   padding: 5px 12px;
-  border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 800;
   display: flex;
   align-items: center;
   gap: 5px;
+  box-shadow: 2px 2px 0 #000;
 `;
 
 const ContentSection = styled(motion.div)`
   width: 100%;
   max-width: 800px;
-  background: ${props => props.theme.colors.windowBackground};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
+  background: #fff;
+  border: 3px solid #000;
   padding: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 6px 6px 0 #000;
   line-height: 1.6;
   font-size: 16px;
+  color: #000;
 
   h2 {
-    color: ${props => props.theme.colors.accent};
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #000;
+    border-bottom: 3px solid #000;
     padding-bottom: 10px;
     margin-top: 30px;
+    font-weight: 800;
   }
   
   ul {
@@ -85,11 +91,13 @@ const ContentSection = styled(motion.div)`
     margin-bottom: 10px;
     padding-left: 20px;
     position: relative;
+    font-weight: 600;
     &:before {
       content: '>';
-      color: ${props => props.theme.colors.accent};
+      color: #000;
       position: absolute;
       left: 0;
+      font-weight: 900;
     }
   }
 `;

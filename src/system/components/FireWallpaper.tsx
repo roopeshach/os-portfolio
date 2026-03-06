@@ -11,11 +11,19 @@ const Canvas = styled.canvas`
   background: ${props => props.theme.colors.background};
 `;
 
+interface Shape {
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  rotation: number;
+  rotationSpeed: number;
+  type: 'square' | 'triangle' | 'circle' | 'cross';
+}
+
 const FireWallpaper: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const theme = useTheme();
-  
-  // Mouse tracking
   const mouse = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -27,201 +35,131 @@ const FireWallpaper: React.FC = () => {
 
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
-    
-    // Scene Variables
-    let frame = 0;
-    
-    // Static Shapes (Crystals)
-    const shapes = Array.from({ length: 12 }, (_, i) => ({
-      x: (Math.random() - 0.5) * width * 1.5,
-      y: (Math.random() - 0.5) * height * 1.5,
-      z: Math.random() * 200 + 100, // Depth
-      size: Math.random() * 40 + 20,
-      baseRotX: Math.random() * Math.PI,
-      baseRotY: Math.random() * Math.PI,
-      type: Math.random() > 0.5 ? 'octahedron' : 'diamond' 
+
+    const colors = [
+      theme.colors.brutalistYellow || '#ffd93d',
+      theme.colors.brutalistBlue || '#4d96ff',
+      theme.colors.brutalistPink || '#ff6b9d',
+      theme.colors.brutalistGreen || '#6bcb77',
+      theme.colors.brutalistOrange || '#ff9f43',
+      theme.colors.brutalistPurple || '#a66cff',
+    ];
+
+    // Generate random shapes
+    const shapes: Shape[] = Array.from({ length: 15 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 60 + 30,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * Math.PI * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.02,
+      type: (['square', 'triangle', 'circle', 'cross'] as const)[Math.floor(Math.random() * 4)],
     }));
 
-    const project = (x: number, y: number, z: number) => {
-      const scale = 500 / (500 + z);
-      const px = width / 2 + x * scale;
-      const py = height / 2 + y * scale;
-      return { x: px, y: py, scale };
+    const drawShape = (shape: Shape, mx: number, my: number) => {
+      const parallaxX = (mx - width / 2) * 0.02;
+      const parallaxY = (my - height / 2) * 0.02;
+      
+      ctx.save();
+      ctx.translate(shape.x + parallaxX, shape.y + parallaxY);
+      ctx.rotate(shape.rotation);
+      
+      ctx.fillStyle = shape.color;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 3;
+
+      const s = shape.size;
+
+      switch (shape.type) {
+        case 'square':
+          ctx.fillRect(-s/2, -s/2, s, s);
+          ctx.strokeRect(-s/2, -s/2, s, s);
+          break;
+        case 'triangle':
+          ctx.beginPath();
+          ctx.moveTo(0, -s/2);
+          ctx.lineTo(s/2, s/2);
+          ctx.lineTo(-s/2, s/2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(0, 0, s/2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'cross':
+          const thickness = s / 3;
+          ctx.beginPath();
+          ctx.rect(-thickness/2, -s/2, thickness, s);
+          ctx.rect(-s/2, -thickness/2, s, thickness);
+          ctx.fill();
+          ctx.strokeRect(-thickness/2, -s/2, thickness, s);
+          ctx.strokeRect(-s/2, -thickness/2, s, thickness);
+          break;
+      }
+      
+      ctx.restore();
     };
 
-    const drawCrystal = (shape: typeof shapes[0], mx: number, my: number) => {
-        const { x, y, z, size, baseRotX, baseRotY, type } = shape;
-        
-        // Interaction Rotation
-        // Calculate vector from center to shape
-        // Add mouse influence
-        const rotX = baseRotX + my * 0.002;
-        const rotY = baseRotY + mx * 0.002;
-
-        let vertices: {x:number, y:number, z:number}[] = [];
-        let edges: number[][] = [];
-
-        if (type === 'octahedron') {
-            // Octahedron Vertices
-            vertices = [
-                {x:0, y:size, z:0},      // 0: Top
-                {x:0, y:-size, z:0},     // 1: Bottom
-                {x:size, y:0, z:0},      // 2: Right
-                {x:-size, y:0, z:0},     // 3: Left
-                {x:0, y:0, z:size},      // 4: Front
-                {x:0, y:0, z:-size},     // 5: Back
-            ];
-            // Octahedron Edges
-            edges = [
-                [0,2], [0,3], [0,4], [0,5], // Top pyramid
-                [1,2], [1,3], [1,4], [1,5], // Bottom pyramid
-                [2,4], [4,3], [3,5], [5,2]  // Middle ring
-            ];
-        } else {
-             // Diamond / Prism
-             vertices = [
-                {x:0, y:size*1.2, z:0},   // 0: Top
-                {x:0, y:-size*1.2, z:0},  // 1: Bottom
-                {x:size*0.7, y:0, z:size*0.7},   // 2
-                {x:-size*0.7, y:0, z:size*0.7},  // 3
-                {x:-size*0.7, y:0, z:-size*0.7}, // 4
-                {x:size*0.7, y:0, z:-size*0.7},  // 5
-             ];
-             edges = [
-                 [0,2], [0,3], [0,4], [0,5],
-                 [1,2], [1,3], [1,4], [1,5],
-                 [2,3], [3,4], [4,5], [5,2]
-             ];
-        }
-
-        // Rotate and Translate
-        const projectedVerts = vertices.map(v => {
-            let vx = v.x, vy = v.y, vz = v.z;
-
-            // Rot X
-            let dy = vy * Math.cos(rotX) - vz * Math.sin(rotX);
-            let dz = vy * Math.sin(rotX) + vz * Math.cos(rotX);
-            vy = dy; vz = dz;
-
-            // Rot Y
-            let dx = vx * Math.cos(rotY) - vz * Math.sin(rotY);
-            dz = vx * Math.sin(rotY) + vz * Math.cos(rotY);
-            vx = dx; vz = dz;
-
-            return project(x + vx, y + vy, z + vz);
-        });
-
-        // Draw with glow effect
-        ctx.save();
-        ctx.shadowColor = theme.colors.accent;
-        ctx.shadowBlur = 15;
-        ctx.strokeStyle = theme.colors.accent; 
-        ctx.lineWidth = 1.5;
+    const drawGrid = () => {
+      ctx.strokeStyle = `${theme.colors.accent}30`;
+      ctx.lineWidth = 1;
+      const spacing = 50;
+      
+      for (let x = 0; x < width; x += spacing) {
         ctx.beginPath();
-        edges.forEach(edge => {
-            const p1 = projectedVerts[edge[0]];
-            const p2 = projectedVerts[edge[1]];
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-        });
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
         ctx.stroke();
-        
-        // Draw again without shadow for crisp lines
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = `${theme.colors.accent}cc`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.restore();
-
-        // Fill semi-transparent for "Crystal" look with glow
-        ctx.fillStyle = `${theme.colors.accent}18`; // Slightly more visible
-        ctx.shadowColor = theme.colors.accent;
-        ctx.shadowBlur = 25;
+      }
+      
+      for (let y = 0; y < height; y += spacing) {
         ctx.beginPath();
-        // Simple hull fill for effect (not perfect 3d fill)
-        if (projectedVerts.length > 0) {
-            ctx.moveTo(projectedVerts[0].x, projectedVerts[0].y);
-            projectedVerts.forEach(p => ctx.lineTo(p.x, p.y));
-            ctx.closePath();
-            ctx.fill();
-        }
-    };
-
-    const drawGrid = (mx: number, my: number) => {
-       ctx.save();
-       ctx.strokeStyle = `${theme.colors.accent}25`; // Use accent color with transparency
-       ctx.shadowColor = theme.colors.accent;
-       ctx.shadowBlur = 2;
-       ctx.lineWidth = 0.5;
-       ctx.beginPath();
-       
-       // Static grid, maybe slight parallax
-       const parallaxX = mx * 0.05;
-       const parallaxY = my * 0.05;
-
-       const spacing = 100;
-       
-       // Vertical
-       for (let x = -width; x < width * 2; x += spacing) {
-           const p1 = project(x - width/2 - parallaxX, -200 - parallaxY, 0);
-           const p2 = project(x - width/2 - parallaxX, -200 - parallaxY, 1000);
-           ctx.moveTo(p1.x, p1.y);
-           ctx.lineTo(p2.x, p2.y);
-       }
-       
-       // Horizontal
-       for (let z = 0; z < 1000; z += spacing) {
-           const p1 = project(-width - parallaxX, -200 - parallaxY, z);
-           const p2 = project(width - parallaxX, -200 - parallaxY, z);
-           ctx.moveTo(p1.x, p1.y);
-           ctx.lineTo(p2.x, p2.y);
-       }
-       ctx.stroke();
-       ctx.restore();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
     };
 
     const draw = () => {
-        ctx.fillStyle = theme.colors.background;
-        ctx.fillRect(0, 0, width, height);
-
-        // Current mouse target
-        const targetX = mouse.current.x - width / 2;
-        const targetY = mouse.current.y - height / 2;
-        
-        // Smooth follow
-        // We can just use raw for crisp response or lerp. Raw is "more interactive".
-        
-        drawGrid(targetX, targetY);
-
-        shapes.forEach(shape => {
-            drawCrystal(shape, targetX, targetY);
-        });
+      ctx.fillStyle = theme.colors.background;
+      ctx.fillRect(0, 0, width, height);
+      
+      drawGrid();
+      
+      shapes.forEach(shape => {
+        shape.rotation += shape.rotationSpeed;
+        drawShape(shape, mouse.current.x, mouse.current.y);
+      });
     };
 
     let animationId: number;
     const loop = () => {
-        draw();
-        animationId = requestAnimationFrame(loop);
+      draw();
+      animationId = requestAnimationFrame(loop);
     };
     loop();
 
     const handleMouseMove = (e: MouseEvent) => {
-        mouse.current.x = e.clientX;
-        mouse.current.y = e.clientY;
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
     };
 
     const handleResize = () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', handleResize);
 
     return () => {
-        cancelAnimationFrame(animationId);
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
     };
   }, [theme]);
 

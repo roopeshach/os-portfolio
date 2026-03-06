@@ -7,42 +7,51 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   overflow: hidden;
 `;
 
 const VideoArea = styled.div`
   flex: 1;
-  background: linear-gradient(135deg, #40251F 0%, #5C3830 100%);
+  background: #1a1a2e;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border: 3px solid #000;
 `;
 
 const Controls = styled.div`
   height: 60px;
-  background: ${props => props.theme.colors.windowBackground};
-  backdrop-filter: blur(10px);
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  border-top: 1px solid ${props => props.theme.colors.border};
+  border-top: 3px solid #000;
 `;
 
 const ControlButton = styled.button`
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  border: 3px solid #000;
+  color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.8;
-  &:hover { opacity: 1; color: ${props => props.theme.colors.accent}; }
+  padding: 10px;
+  box-shadow: 3px 3px 0 #000;
+  transition: all 0.1s;
+  &:hover { 
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+  }
+  &:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+  }
 `;
 
 const IntroAnimation = ({ playing }: { playing: boolean }) => {

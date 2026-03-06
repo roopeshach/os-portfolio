@@ -17,23 +17,23 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 100000;
-  color: ${props => props.theme.colors.text};
+  color: #000;
   font-family: 'Rajdhani', sans-serif;
 `;
 
 const UserAvatar = styled.div`
   width: 120px;
   height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, ${props => props.theme.colors.accent} 0%, #CEB67E 100%);
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 #000;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  font-weight: bold;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  color: #40251F;
+  font-weight: 900;
+  color: #000;
   position: relative;
   z-index: 1;
 `;
@@ -41,57 +41,65 @@ const UserAvatar = styled.div`
 const UserName = styled.h2`
   font-size: 32px;
   margin-bottom: 40px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-weight: 900;
+  color: #000;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  padding: 10px 30px;
+  border: 4px solid #000;
+  box-shadow: 5px 5px 0 #000;
   z-index: 1;
 `;
 
 const EnterButton = styled.button`
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 40px;
-  color: #fff;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border: 4px solid #000;
+  padding: 15px 50px;
+  color: #000;
   font-size: 18px;
-  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
   font-family: 'Rajdhani', sans-serif;
   display: flex;
   align-items: center;
   gap: 10px;
-  backdrop-filter: blur(10px);
   z-index: 1;
-  font-weight: bold;
+  font-weight: 900;
+  box-shadow: 5px 5px 0 #000;
+  text-transform: uppercase;
 
   &:hover {
-    background: ${props => props.theme.colors.accent};
-    border-color: ${props => props.theme.colors.accent};
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(206, 217, 121, 0.4);
-    color: #40251F;
+    background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 #000;
   }
   &:active {
-    transform: translateY(0);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
   }
 `;
 
 const TimeDisplay = styled.div`
   position: absolute;
-  bottom: 50px;
+  bottom: 80px;
   font-size: 64px;
   font-weight: 900;
-  color: #fff;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  color: #000;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  padding: 10px 40px;
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 #000;
   z-index: 1;
 `;
 
 const DateDisplay = styled.div`
   position: absolute;
-  bottom: 30px;
+  bottom: 50px;
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 600;
+  color: #000;
+  font-weight: 800;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  padding: 5px 20px;
+  border: 3px solid #000;
   z-index: 1;
 `;
 

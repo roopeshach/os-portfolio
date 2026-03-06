@@ -8,8 +8,8 @@ import { Code, ArrowRight } from 'lucide-react';
 
 const Container = styled.div`
   height: 100%;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   padding: 20px;
   overflow-y: auto;
   display: flex;
@@ -25,10 +25,11 @@ const Title = styled.h1`
   font-size: 24px;
   font-family: 'Rajdhani', sans-serif;
   text-transform: uppercase;
-  color: ${props => props.theme.colors.accent};
+  color: #000;
   display: flex;
   align-items: center;
   gap: 10px;
+  font-weight: 800;
 `;
 
 const Grid = styled.div`
@@ -38,9 +39,8 @@ const Grid = styled.div`
 `;
 
 const ProjectCard = styled(motion.div)`
-  background: ${props => props.theme.colors.windowBackground};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border: 3px solid #000;
   padding: 20px;
   cursor: pointer;
   display: flex;
@@ -48,26 +48,29 @@ const ProjectCard = styled(motion.div)`
   gap: 10px;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s;
+  box-shadow: 4px 4px 0 #000;
+  transition: all 0.1s;
 
   &:hover {
-    border-color: ${props => props.theme.colors.accent};
-    box-shadow: 0 0 15px rgba(0, 216, 255, 0.1);
-    transform: translateY(-2px);
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0 #000;
+    background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
   }
 `;
 
 const ProjectTitle = styled.h3`
   margin: 0;
   font-size: 18px;
-  color: ${props => props.theme.colors.text};
+  color: #000;
+  font-weight: 800;
 `;
 
 const ProjectTagline = styled.p`
   margin: 0;
   font-size: 12px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: #000;
   line-height: 1.4;
+  font-weight: 600;
 `;
 
 const TagContainer = styled.div`

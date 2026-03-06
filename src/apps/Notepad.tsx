@@ -13,28 +13,37 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
 `;
 
 const Toolbar = styled.div`
-  padding: 5px;
-  background: ${props => props.theme.colors.taskbar};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
+  padding: 8px;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border-bottom: 3px solid #000;
   display: flex;
   gap: 10px;
   align-items: center;
 `;
 
 const Button = styled.button`
-  background: ${props => props.theme.colors.accent};
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+  color: #000;
+  border: 3px solid #000;
+  padding: 6px 12px;
   cursor: pointer;
+  font-weight: 800;
+  font-family: 'Rajdhani', sans-serif;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.1s ease;
+  
   &:hover {
-    opacity: 0.9;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #000;
+  }
+  &:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
   }
 `;
 
@@ -47,27 +56,28 @@ const EditorContainer = styled.div`
 const TextArea = styled.textarea`
   flex: 1;
   resize: none;
-  padding: 10px;
+  padding: 15px;
   border: none;
   outline: none;
   font-family: 'Consolas', monospace;
   font-size: 14px;
-  background: ${props => props.theme.colors.windowBackground};
-  color: ${props => props.theme.colors.text};
+  background: #fff;
+  color: #000;
+  font-weight: 500;
 `;
 
 const PreviewArea = styled.div`
   flex: 1;
-  padding: 10px;
+  padding: 15px;
   overflow-y: auto;
-  border-left: 1px solid ${props => props.theme.colors.border};
-  background: ${props => props.theme.colors.windowBackground};
-  color: ${props => props.theme.colors.text};
+  border-left: 3px solid #000;
+  background: #fff;
+  color: #000;
 
-  h1, h2, h3 { border-bottom: 1px solid ${props => props.theme.colors.border}; padding-bottom: 5px; }
-  a { color: ${props => props.theme.colors.accent}; }
-  code { background: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px; }
-  pre { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; overflow-x: auto; }
+  h1, h2, h3 { border-bottom: 3px solid #000; padding-bottom: 5px; font-weight: 800; }
+  a { color: ${props => props.theme.colors.brutalistBlue || '#4d96ff'}; font-weight: 700; }
+  code { background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'}; padding: 2px 6px; border: 2px solid #000; color: #000; }
+  pre { background: ${props => props.theme.colors.brutalistPurple || '#a66cff'}; padding: 10px; border: 3px solid #000; overflow-x: auto; color: #000; }
   ul, ol { padding-left: 20px; }
 `;
 
@@ -126,6 +136,28 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
       setStatus('Error saving');
     }
   };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.metaKey || e.ctrlKey;
+      if (!isMod) return;
+      if (e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        void handleSave();
+      }
+    };
+
+    const onAppSave = () => {
+      void handleSave();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('app:save', onAppSave as EventListener);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('app:save', onAppSave as EventListener);
+    };
+  }, [content, currentPath]);
 
   return (
     <Container>

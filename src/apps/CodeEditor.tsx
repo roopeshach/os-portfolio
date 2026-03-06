@@ -168,7 +168,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       
       for (const item of items) {
         const fullPath = pathModule.join(dirPath, item);
-        const stats = await new Promise<any>((resolve) => fs.stat(fullPath, (err, stats) => resolve(stats)));
+        const stats = await new Promise<any>((resolve) => fs.stat(fullPath, (...args: any[]) => resolve(args[1])));
         
         nodes.push({
           name: item,
@@ -269,6 +269,28 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       setStatus('Error saving file');
     }
   };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.metaKey || e.ctrlKey;
+      if (!isMod) return;
+      if (e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        void handleSave();
+      }
+    };
+
+    const onAppSave = () => {
+      void handleSave();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('app:save', onAppSave as EventListener);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('app:save', onAppSave as EventListener);
+    };
+  }, [activeFileIndex, openFiles]);
 
   const handleRun = () => {
     if (activeFileIndex === -1) return;

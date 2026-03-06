@@ -1,16 +1,24 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes, useTheme } from 'styled-components';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Taskbar from './Taskbar';
 import WindowManager from './WindowManager';
 import { readdir, fs, path as pathModule } from './FileSystem';
 import { openProcess } from '../store/processSlice';
 import { Folder, Terminal, Globe, FileText, Code, File } from 'lucide-react';
-import type { Stats, ErrnoException } from '../types/filesystem';
 import SystemAlert from './components/SystemAlert';
 import SystemModal from './components/SystemModal';
 import { showAlert } from '../store/systemSlice';
 import FireWallpaper from './components/FireWallpaper';
+
+interface IconPosition {
+  x: number;
+  y: number;
+}
+
+interface IconPositions {
+  [key: string]: IconPosition;
+}
 
 const DesktopContainer = styled.div`
   width: 100%;
@@ -20,124 +28,102 @@ const DesktopContainer = styled.div`
   background: ${props => props.theme.colors.background};
 `;
 
-const DesktopIcons = styled.div`
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  height: 100%;
-  align-content: flex-start;
-  gap: 15px;
+const DesktopIconsContainer = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 56px; /* Leave space for taskbar */
   z-index: 10;
-  pointer-events: none; /* Let clicks pass through if needed, but icons need events */
+  pointer-events: none;
 `;
 
-const float = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-`;
-
-const IconWrapper = styled.div`
+const IconWrapper = styled.div<{ $x: number; $y: number; $isDragging?: boolean }>`
   width: 90px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
+  cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
   padding: 12px;
-  border: 2px solid transparent;
-  border-radius: 14px;
+  border: 3px solid #000;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(4px);
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 14px;
-    background: radial-gradient(circle at center, ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.2)'} 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+  box-shadow: ${props => props.$isDragging ? '8px 8px 0 #000' : '4px 4px 0 #000'};
+  position: absolute;
+  left: ${props => props.$x}px;
+  top: ${props => props.$y}px;
+  z-index: ${props => props.$isDragging ? 1000 : 1};
+  opacity: ${props => props.$isDragging ? 0.9 : 1};
+  transform: ${props => props.$isDragging ? 'scale(1.05)' : 'scale(1)'};
+  user-select: none;
   
   &:hover {
-    background: ${props => props.theme.colors.glassBg || 'rgba(60, 35, 28, 0.5)'};
-    border: 2px solid ${props => props.theme.colors.accent};
-    box-shadow: 0 8px 32px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
-                0 0 20px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.15)'};
-    animation: ${float} 2s ease-in-out infinite;
-    
-    &::before {
-      opacity: 1;
-    }
-    
-    svg {
-      filter: drop-shadow(0 0 8px ${props => props.theme.colors.accent});
-      transform: scale(1.1);
-    }
+    background: ${props => props.theme.colors.brutalistOrange || '#ff9f43'};
   }
   
-  color: ${props => props.theme.colors.text};
-  font-weight: bold;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #000;
+  font-weight: 800;
+  transition: ${props => props.$isDragging ? 'none' : 'box-shadow 0.1s ease, background 0.1s ease, transform 0.1s ease'};
   
   svg {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #000;
   }
 `;
 
 const IconLabel = styled.div`
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
   margin-top: 8px;
   word-break: break-word;
   line-height: 1.3;
-  text-shadow: 0 1px 4px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.3)'};
-  font-weight: 600;
+  font-weight: 800;
+  font-family: 'Rajdhani', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #000;
 `;
 
 const slideIn = keyframes`
   0% { 
     opacity: 0; 
-    transform: translateY(30px) scale(0.95);
-    filter: blur(4px);
+    transform: translateY(20px);
   }
   15% { 
     opacity: 1; 
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translateY(0);
   }
   85% { 
     opacity: 1; 
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translateY(0);
   }
   100% { 
     opacity: 0; 
-    transform: translateY(-20px) scale(0.98);
-    filter: blur(2px);
+    transform: translateY(-10px);
   }
 `;
 
-const underlineGrow = keyframes`
-  0% { width: 0%; opacity: 0; }
-  20% { width: 60%; opacity: 1; }
-  80% { width: 60%; opacity: 1; }
-  100% { width: 0%; opacity: 0; }
-`;
-
-const pulse = keyframes`
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+const subtitleSlide = keyframes`
+  0% { 
+    opacity: 0; 
+    transform: translateY(15px);
+  }
+  20% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+  80% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-10px);
+  }
 `;
 
 const GreetingContainer = styled.div`
   position: absolute;
-  bottom: 100px;
+  bottom: 120px;
   left: 0;
   width: 100%;
   display: flex;
@@ -150,122 +136,44 @@ const GreetingContainer = styled.div`
 
 const NameText = styled.h1`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 900;
   margin: 0;
-  letter-spacing: 8px;
+  letter-spacing: 10px;
   text-transform: uppercase;
-  color: ${props => props.theme.colors.text};
-  background: linear-gradient(135deg, 
-    ${props => props.theme.colors.accent} 0%, 
-    #fff 25%,
-    #CEB67E 50%, 
-    #fff 75%,
-    ${props => props.theme.colors.accent} 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: ${slideIn} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  color: #000;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  padding: 10px 40px;
+  border: 4px solid #000;
+  box-shadow: 8px 8px 0 #000;
+  animation: ${slideIn} 5s ease-in-out infinite;
   position: relative;
-  text-shadow: none;
-  filter: drop-shadow(0 0 30px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.5)'});
-  
-  &::before {
-    content: attr(data-text);
-    position: absolute;
-    inset: 0;
-    background: inherit;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: blur(20px);
-    opacity: 0.5;
-    animation: ${pulse} 3s ease-in-out infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 3px;
-    background: linear-gradient(90deg, 
-      transparent, 
-      ${props => props.theme.colors.accent}, 
-      #fff,
-      ${props => props.theme.colors.accent}, 
-      transparent);
-    animation: ${underlineGrow} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    border-radius: 2px;
-    box-shadow: 0 0 20px ${props => props.theme.colors.accent};
-  }
-`;
-
-const subtitleSlide = keyframes`
-  0% { 
-    opacity: 0; 
-    transform: translateY(20px);
-  }
-  20% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-  80% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-  100% { 
-    opacity: 0; 
-    transform: translateY(-15px);
-  }
-`;
-
-const shimmer = keyframes`
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
 `;
 
 const GreetingText = styled.div`
   font-family: 'Rajdhani', sans-serif;
-  font-size: 16px;
-  color: ${props => props.theme.colors.text};
-  background: ${props => props.theme.colors.glassBg || 'rgba(60, 35, 28, 0.6)'};
-  border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 8px 32px ${props => props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
-              0 0 40px ${props => props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.1)'},
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  padding: 10px 28px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0 #000;
+  padding: 12px 30px;
   margin-top: 20px;
-  border-radius: 25px;
-  animation: ${subtitleSlide} 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: ${subtitleSlide} 5s ease-in-out infinite;
   animation-delay: 0.15s;
-  font-weight: 600;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(255, 255, 255, 0.1) 50%, 
-      transparent 100%);
-    background-size: 200% 100%;
-    animation: ${shimmer} 3s linear infinite;
-  }
+  text-transform: uppercase;
 `;
 
 const Desktop: React.FC = () => {
   const dispatch = useDispatch();
-  const theme = useTheme();
   const [items, setItems] = useState<string[]>([]);
   const [greetingIndex, setGreetingIndex] = useState(0);
+  const [iconPositions, setIconPositions] = useState<IconPositions>({});
+  const [draggingIcon, setDraggingIcon] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const greetingData = [
     { name: "ROOPESH ACHARYA", text: "Software Engineer • Full Stack Developer" },
@@ -275,6 +183,82 @@ const Desktop: React.FC = () => {
     { name: "ROOPESH ACHARYA", text: "Open source enthusiast & lifelong learner" },
     { name: "[ Portfolio ]", text: "Explore projects, skills & more →" },
   ];
+
+  // Initialize icon positions
+  const getDefaultPosition = useCallback((index: number): IconPosition => {
+    const iconsPerColumn = Math.floor((window.innerHeight - 100) / 130);
+    const col = Math.floor(index / iconsPerColumn);
+    const row = index % iconsPerColumn;
+    return { x: 15 + col * 110, y: 15 + row * 130 };
+  }, []);
+
+  // Load saved positions from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('desktopIconPositions');
+    if (saved) {
+      try {
+        setIconPositions(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load icon positions');
+      }
+    }
+  }, []);
+
+  // Save positions to localStorage
+  useEffect(() => {
+    if (Object.keys(iconPositions).length > 0) {
+      localStorage.setItem('desktopIconPositions', JSON.stringify(iconPositions));
+    }
+  }, [iconPositions]);
+
+  const handleMouseDown = (e: React.MouseEvent, iconId: string) => {
+    if (e.button !== 0) return; // Only left click
+    const rect = (e.target as HTMLElement).closest('[data-icon]')?.getBoundingClientRect();
+    if (!rect) return;
+    
+    setDraggingIcon(iconId);
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+    e.preventDefault();
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!draggingIcon || !containerRef.current) return;
+    
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newX = e.clientX - containerRect.left - dragOffset.x;
+    const newY = e.clientY - containerRect.top - dragOffset.y;
+    
+    // Clamp to container bounds
+    const clampedX = Math.max(0, Math.min(newX, containerRect.width - 100));
+    const clampedY = Math.max(0, Math.min(newY, containerRect.height - 130));
+    
+    setIconPositions(prev => ({
+      ...prev,
+      [draggingIcon]: { x: clampedX, y: clampedY }
+    }));
+  }, [draggingIcon, dragOffset]);
+
+  const handleMouseUp = useCallback(() => {
+    setDraggingIcon(null);
+  }, []);
+
+  useEffect(() => {
+    if (draggingIcon) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggingIcon, handleMouseMove, handleMouseUp]);
+
+  const getIconPosition = (iconId: string, index: number): IconPosition => {
+    return iconPositions[iconId] || getDefaultPosition(index);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -317,7 +301,7 @@ const Desktop: React.FC = () => {
       return;
     }
 
-    fs.stat(fullPath, (err: ErrnoException | null, stats?: Stats) => {
+    (fs as any).stat(fullPath, (err: any, stats: any) => {
       if (!err && stats) {
         if (stats.isDirectory()) {
           dispatch(openProcess({
@@ -331,8 +315,7 @@ const Desktop: React.FC = () => {
           const ext = pathModule.extname(filename);
           if (filename.endsWith('.link')) {
             // Read link content
-            // @ts-ignore
-            fs.readFile(fullPath, 'utf8', (err: any, data: string) => {
+            (fs as any).readFile(fullPath, 'utf8', (err: any, data: string) => {
                if (!err && data.trim().startsWith('http')) {
                  dispatch(openProcess({
                    appId: 'Browser',
@@ -374,12 +357,12 @@ const Desktop: React.FC = () => {
 
   const getIcon = (filename: string) => {
     if (filename.includes('.')) {
-      if (filename.endsWith('.link')) return <Globe size={40} color={theme.colors.accent} />;
-      if (filename.endsWith('.txt')) return <FileText size={40} color={theme.colors.text} />;
-      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color={theme.colors.accent} />;
-      return <File size={40} color={theme.colors.text} />;
+      if (filename.endsWith('.link')) return <Globe size={40} color="#000" />;
+      if (filename.endsWith('.txt')) return <FileText size={40} color="#000" />;
+      if (filename.endsWith('.js') || filename.endsWith('.ts')) return <Code size={40} color="#000" />;
+      return <File size={40} color="#000" />;
     }
-    return <Folder size={40} color={theme.colors.accent} />;
+    return <Folder size={40} color="#000" />;
   };
 
   return (
@@ -393,28 +376,47 @@ const Desktop: React.FC = () => {
            {greetingData[greetingIndex].text}
         </GreetingText>
       </GreetingContainer>
-      <DesktopIcons>
-        <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: '/assets/icons/terminal.svg', componentName: 'Terminal' }))}>
-          <Terminal size={40} color={theme.colors.accent} />
+      <DesktopIconsContainer ref={containerRef}>
+        <IconWrapper 
+          $x={getIconPosition('terminal', 0).x}
+          $y={getIconPosition('terminal', 0).y}
+          $isDragging={draggingIcon === 'terminal'}
+          data-icon="terminal"
+          onMouseDown={(e) => handleMouseDown(e, 'terminal')}
+          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: '/assets/icons/terminal.svg', componentName: 'Terminal' }))}
+        >
+          <Terminal size={40} color="#000" />
           <IconLabel>Terminal</IconLabel>
         </IconWrapper>
         
-        <IconWrapper onDoubleClick={() => dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: '/assets/icons/folder.svg', componentName: 'File Explorer' }))}>
-           <Folder size={40} color={theme.colors.accent} />
+        <IconWrapper 
+          $x={getIconPosition('fileexplorer', 1).x}
+          $y={getIconPosition('fileexplorer', 1).y}
+          $isDragging={draggingIcon === 'fileexplorer'}
+          data-icon="fileexplorer"
+          onMouseDown={(e) => handleMouseDown(e, 'fileexplorer')}
+          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: '/assets/icons/folder.svg', componentName: 'File Explorer' }))}
+        >
+           <Folder size={40} color="#000" />
            <IconLabel>This PC</IconLabel>
         </IconWrapper>
 
-        {items.map(item => (
+        {items.map((item, index) => (
           <IconWrapper 
-            key={item} 
-            onDoubleClick={() => handleOpen(item)}
+            key={item}
+            $x={getIconPosition(item, index + 2).x}
+            $y={getIconPosition(item, index + 2).y}
+            $isDragging={draggingIcon === item}
+            data-icon={item}
             data-file-path={pathModule.join('/Users/Roopesh/Desktop', item)}
+            onMouseDown={(e) => handleMouseDown(e, item)}
+            onDoubleClick={() => !draggingIcon && handleOpen(item)}
           >
             {getIcon(item)}
             <IconLabel>{item.replace('.link', '')}</IconLabel>
           </IconWrapper>
         ))}
-      </DesktopIcons>
+      </DesktopIconsContainer>
       <WindowManager />
       <Taskbar />
       <SystemAlert />

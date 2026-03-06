@@ -1,51 +1,65 @@
 import type { DefaultTheme } from 'styled-components';
 
-// Dark Theme - Rich Brown & Lime with enhanced visual depth
+// Neubrutalism Dark Theme - Bold colors, hard shadows, thick borders
 export const darkTheme: DefaultTheme = {
   colors: {
-    background: '#2A1810', // Deeper Brown for contrast
-    taskbar: 'rgba(30, 15, 10, 0.85)',
-    taskbarHover: '#CED979', // Lime Green
-    startMenu: 'rgba(45, 26, 21, 0.95)',
-    windowBackground: 'rgba(60, 35, 28, 0.92)',
-    text: '#E8E8E8', // Brighter text
-    textSecondary: '#CEB67E', // Tan
-    accent: '#CED979', // Lime Green
-    accentGlow: 'rgba(206, 217, 121, 0.4)',
-    border: 'rgba(206, 217, 121, 0.25)',
-    selection: '#CED979',
-    hover: '#CED979',
-    glassBg: 'rgba(45, 26, 21, 0.7)',
-    glassBlur: '20px',
-    shadow: 'rgba(0, 0, 0, 0.4)',
-    glow: 'rgba(206, 217, 121, 0.3)',
+    background: '#1a1a2e', // Deep navy
+    taskbar: '#16213e',
+    taskbarHover: '#ffd93d', // Bright yellow
+    startMenu: '#1a1a2e',
+    windowBackground: '#0f0f23',
+    text: '#ffffff',
+    textSecondary: '#b8b8d1',
+    accent: '#ffd93d', // Bright yellow
+    accentGlow: 'transparent',
+    border: '#000000',
+    selection: '#ff6b6b', // Coral red
+    hover: '#6bcb77', // Mint green
+    glassBg: '#1a1a2e',
+    glassBlur: '0px',
+    shadow: '#000000',
+    glow: 'transparent',
+    // Neubrutalism specific
+    brutalistYellow: '#ffd93d',
+    brutalistBlue: '#4d96ff',
+    brutalistPink: '#ff6b9d',
+    brutalistGreen: '#6bcb77',
+    brutalistOrange: '#ff9f43',
+    brutalistPurple: '#a66cff',
   },
   sizes: {
-    taskbarHeight: '52px',
+    taskbarHeight: '56px',
   },
 };
 
-// Light Theme - Silver & Lime with enhanced visual depth
+// Neubrutalism Light Theme - Bold colors, hard shadows, thick borders
 export const lightTheme: DefaultTheme = {
   colors: {
-    background: '#C8C8C8', // Light Gray
-    taskbar: 'rgba(200, 200, 200, 0.85)',
-    taskbarHover: '#CED979', // Lime Green
-    startMenu: 'rgba(210, 210, 210, 0.95)',
-    windowBackground: 'rgba(220, 220, 220, 0.92)',
-    text: '#2A1810', // Darker Brown for contrast
-    textSecondary: '#5C3830', // Lighter Brown
-    accent: '#B8C260', // Slightly darker lime for light theme
-    accentGlow: 'rgba(184, 194, 96, 0.4)',
-    border: 'rgba(100, 100, 100, 0.3)',
-    selection: '#CEB67E', // Tan
-    hover: '#CEB67E', // Tan
-    glassBg: 'rgba(220, 220, 220, 0.7)',
-    glassBlur: '20px',
-    shadow: 'rgba(0, 0, 0, 0.15)',
-    glow: 'rgba(184, 194, 96, 0.3)',
+    background: '#fffbe6', // Cream/off-white
+    taskbar: '#ffd93d', // Bright yellow taskbar
+    taskbarHover: '#ff6b6b',
+    startMenu: '#ffffff',
+    windowBackground: '#ffffff',
+    text: '#1a1a2e',
+    textSecondary: '#4a4a68',
+    accent: '#4d96ff', // Bright blue
+    accentGlow: 'transparent',
+    border: '#000000',
+    selection: '#ff6b9d', // Pink
+    hover: '#6bcb77', // Green
+    glassBg: '#ffffff',
+    glassBlur: '0px',
+    shadow: '#000000',
+    glow: 'transparent',
+    // Neubrutalism specific
+    brutalistYellow: '#ffd93d',
+    brutalistBlue: '#4d96ff',
+    brutalistPink: '#ff6b9d',
+    brutalistGreen: '#6bcb77',
+    brutalistOrange: '#ff9f43',
+    brutalistPurple: '#a66cff',
   },
   sizes: {
-    taskbarHeight: '52px',
+    taskbarHeight: '56px',
   },
 };

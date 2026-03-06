@@ -4,18 +4,16 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PopupContainer = styled.div`
   position: absolute;
-  bottom: 60px;
+  bottom: 65px;
   right: 10px;
   width: 340px;
-  background: rgba(10, 15, 30, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 3px solid #000;
   padding: 20px;
-  box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
+  box-shadow: 6px 6px 0 #000;
   z-index: 10000;
-  color: ${props => props.theme.colors.text};
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #000;
+  animation: slideUp 0.15s ease-out;
 
   @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
@@ -32,27 +30,27 @@ const Header = styled.div`
 
 const MonthLabel = styled.div`
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
-  color: ${props => props.theme.colors.accent};
+  color: #000;
   text-transform: uppercase;
 `;
 
 const NavButton = styled.button`
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border: 3px solid #000;
+  color: #000;
   padding: 4px;
-  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.1s;
 
   &:hover {
-    background: rgba(0, 216, 255, 0.2);
-    border-color: ${props => props.theme.colors.accent};
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
   }
 `;
 
@@ -65,8 +63,8 @@ const Grid = styled.div`
 
 const DayLabel = styled.div`
   font-size: 12px;
-  color: ${props => props.theme.colors.textSecondary};
-  font-weight: 600;
+  color: #000;
+  font-weight: 800;
   margin-bottom: 8px;
 `;
 
@@ -76,33 +74,37 @@ const DateCell = styled.div<{ $isToday?: boolean; $isOtherMonth?: boolean }>`
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  border-radius: 6px;
   cursor: pointer;
-  color: ${props => props.$isOtherMonth ? 'rgba(255, 255, 255, 0.2)' : props.theme.colors.text};
-  background: ${props => props.$isToday ? props.theme.colors.accent : 'transparent'};
-  box-shadow: ${props => props.$isToday ? `0 0 15px ${props.theme.colors.accent}` : 'none'};
-  font-weight: ${props => props.$isToday ? 'bold' : 'normal'};
+  font-weight: 700;
+  color: #000;
+  border: ${props => props.$isToday ? '3px solid #000' : '2px solid transparent'};
+  background: ${props => props.$isToday ? (props.theme.colors.brutalistPink || '#ff6b9d') : 'transparent'};
+  box-shadow: ${props => props.$isToday ? '2px 2px 0 #000' : 'none'};
+  opacity: ${props => props.$isOtherMonth ? 0.4 : 1};
   
   &:hover {
-    background: ${props => props.$isToday ? props.theme.colors.accent : 'rgba(255, 255, 255, 0.1)'};
+    background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+    border: 2px solid #000;
   }
 `;
 
 const TimeDisplay = styled.div`
   font-family: 'Fira Code', monospace;
   font-size: 32px;
-  font-weight: 300;
+  font-weight: 800;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid #000;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  color: #000;
 `;
 
 const DateSub = styled.div`
   font-size: 14px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: #000;
+  font-weight: 700;
 `;
 
 const CalendarPopup: React.FC = () => {

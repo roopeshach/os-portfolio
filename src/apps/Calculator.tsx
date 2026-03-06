@@ -5,12 +5,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
 `;
 
 const Display = styled.div`
-  background: rgba(0, 0, 0, 0.2);
+  background: #fff;
   padding: 20px;
   text-align: right;
   display: flex;
@@ -18,48 +18,54 @@ const Display = styled.div`
   justify-content: flex-end;
   height: 120px;
   overflow: hidden;
+  border-bottom: 3px solid #000;
 `;
 
 const Equation = styled.div`
   font-size: 14px;
-  color: ${props => props.theme.colors.textSecondary};
+  color: #666;
   min-height: 20px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
 `;
 
 const Result = styled.div`
   font-size: 48px;
-  font-weight: 300;
+  font-weight: 800;
   font-family: 'Rajdhani', sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #000;
 `;
 
 const Keypad = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   flex: 1;
-  gap: 1px;
-  background: ${props => props.theme.colors.border};
+  gap: 3px;
+  background: #000;
+  padding: 3px;
 `;
 
 const Button = styled.button<{ $accent?: boolean; $secondary?: boolean }>`
-  background: ${props => props.$accent ? props.theme.colors.accent : props.$secondary ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)'};
-  color: ${props => props.$accent ? '#000' : props.theme.colors.text};
-  border: none;
+  background: ${props => props.$accent ? props.theme.colors.brutalistPink || '#ff6b9d' : props.$secondary ? props.theme.colors.brutalistBlue || '#4d96ff' : props.theme.colors.brutalistGreen || '#6bcb77'};
+  color: #000;
+  border: 3px solid #000;
   font-size: 18px;
   cursor: pointer;
   font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
   transition: all 0.1s;
   
   &:hover {
-    filter: brightness(1.2);
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 #000;
   }
   &:active {
-    filter: brightness(0.9);
+    transform: translate(1px, 1px);
   }
 `;
 

@@ -11,21 +11,14 @@ import { X, Minus, Square, Copy } from 'lucide-react';
 const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $maximized: boolean; $zIndex: number }>`
   position: absolute;
   background: ${props => props.theme.colors.windowBackground};
-  backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
-  -webkit-backdrop-filter: blur(${props => props.theme.colors.glassBlur || '20px'});
-  border: 1px solid ${props => props.$active 
-    ? props.theme.colors.accent 
-    : props.theme.colors.border};
+  border: 3px solid ${props => props.theme.colors.border};
   box-shadow: ${props => props.$active 
-    ? `0 12px 40px ${props.theme.colors.shadow || 'rgba(0, 0, 0, 0.3)'}, 
-       0 0 0 1px ${props.theme.colors.accentGlow || 'rgba(206, 217, 121, 0.2)'},
-       inset 0 1px 0 rgba(255, 255, 255, 0.08)` 
-    : `0 6px 24px ${props.theme.colors.shadow || 'rgba(0, 0, 0, 0.2)'},
-       inset 0 1px 0 rgba(255, 255, 255, 0.05)`};
+    ? '6px 6px 0 #000' 
+    : '4px 4px 0 #000'};
   display: ${props => props.$minimized ? 'none' : 'flex'};
   flex-direction: column;
   z-index: ${props => props.$zIndex};
-  border-radius: 14px;
+  border-radius: 0;
   overflow: hidden;
   
   ${props => props.$maximized && `
@@ -34,33 +27,31 @@ const WindowContainer = styled.div<{ $active: boolean; $minimized: boolean; $max
     left: 0 !important;
     width: 100vw !important;
     height: calc(100vh - ${props.theme.sizes.taskbarHeight}) !important;
-    border: none;
-    border-radius: 0;
-    border-bottom: 1px solid ${props.theme.colors.border};
+    box-shadow: none;
+    border-bottom: 3px solid ${props.theme.colors.border};
   `}
   
-  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  
+  &:hover {
+    ${props => !props.$maximized && 'transform: translate(-2px, -2px);'}
+    ${props => !props.$maximized && 'box-shadow: 8px 8px 0 #000;'}
+  }
 `;
 
 const TitleBar = styled.div<{ $active: boolean }>`
-  height: 40px;
+  height: 44px;
   background: ${props => props.$active 
     ? props.theme.colors.accent
-    : props.theme.colors.windowBackground};
+    : props.theme.colors.textSecondary};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 14px;
+  padding: 0 12px;
   user-select: none;
-  border-bottom: 1px solid ${props => props.$active 
-    ? 'rgba(0, 0, 0, 0.1)' 
-    : props.theme.colors.border};
+  border-bottom: 3px solid ${props => props.theme.colors.border};
   flex-shrink: 0;
   cursor: grab;
-  border-radius: 14px 14px 0 0;
-  position: relative;
-  overflow: hidden;
   
   &:active {
     cursor: grabbing;
@@ -70,50 +61,47 @@ const TitleBar = styled.div<{ $active: boolean }>`
 const Title = styled.div<{ $active: boolean }>`
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
+  gap: 12px;
+  font-size: 14px;
   font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
   flex-grow: 1;
-  color: ${props => props.$active ? '#2A1810' : props.theme.colors.text};
+  color: ${props => props.$active ? '#000' : props.theme.colors.text};
   text-transform: uppercase;
-  
-  svg {
-    color: ${props => props.$active ? '#2A1810' : props.theme.colors.accent};
-  }
 `;
 
 const Controls = styled.div`
   display: flex;
   height: 100%;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 `;
 
 const ControlButton = styled.div<{ type?: 'close'; $active?: boolean }>`
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-radius: 8px;
-  background: ${props => props.$active 
-    ? 'rgba(0, 0, 0, 0.15)' 
-    : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$active ? '#2A1810' : props.theme.colors.text};
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0;
+  border: 2px solid #000;
+  background: ${props => {
+    if (props.type === 'close') return props.theme.colors.brutalistPink || '#ff6b9d';
+    return props.theme.colors.brutalistBlue || '#4d96ff';
+  }};
+  color: #000;
+  transition: all 0.1s ease;
+  box-shadow: 2px 2px 0 #000;
   
   &:hover {
-    background: ${props => props.type === 'close' 
-      ? '#e74c3c' 
-      : props.$active ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.2)'};
-    color: ${props => props.type === 'close' ? '#fff' : props.$active ? '#2A1810' : '#fff'};
-    transform: scale(1.1);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #000;
   }
   &:active {
-    transform: scale(0.9);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
   }
 `;
 

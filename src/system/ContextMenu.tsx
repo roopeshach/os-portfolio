@@ -11,17 +11,15 @@ const Menu = styled.div<{ $x: number; $y: number }>`
   position: fixed;
   top: ${props => props.$y}px;
   left: ${props => props.$x}px;
-  background: rgba(10, 15, 30, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 6px;
-  padding: 4px;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 3px solid #000;
+  padding: 6px;
   min-width: 200px;
   z-index: 99999;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  box-shadow: 5px 5px 0 #000;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 `;
 
 const MenuItem = styled.div`
@@ -30,20 +28,28 @@ const MenuItem = styled.div`
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  border-radius: 4px;
   font-size: 13px;
-  color: ${props => props.theme.colors.text};
+  color: #000;
+  font-weight: 700;
+  border: 2px solid transparent;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border: 2px solid #000;
   
   &:hover {
-    background: ${props => props.theme.colors.accent};
-    color: white;
+    background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 #000;
+  }
+  
+  svg {
+    color: #000;
   }
 `;
 
 const Divider = styled.div`
-  height: 1px;
-  background: rgba(255,255,255,0.1);
-  margin: 2px 0;
+  height: 3px;
+  background: #000;
+  margin: 4px 0;
 `;
 
 interface ContextMenuProps {

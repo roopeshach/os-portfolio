@@ -1,39 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { Terminal, Activity, Layers, Cpu } from 'lucide-react';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #242424;
-  color: #e0e0e0;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
 `;
 
 const Toolbar = styled.div`
   display: flex;
-  background: #333;
-  border-bottom: 1px solid #1e1e1e;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border-bottom: 3px solid #000;
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
-  background: ${props => props.$active ? '#1e1e1e' : 'transparent'};
-  color: ${props => props.$active ? '#fff' : '#aaa'};
+  background: ${props => props.$active ? props.theme.colors.brutalistGreen || '#6bcb77' : 'transparent'};
+  color: #000;
   border: none;
-  border-top: 2px solid ${props => props.$active ? '#007acc' : 'transparent'};
+  border-right: 3px solid #000;
   padding: 8px 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 700;
   
   &:hover {
-    color: #fff;
-    background: #2d2d2d;
+    background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
   }
 `;
 
@@ -41,7 +41,7 @@ const Content = styled.div`
   flex: 1;
   overflow: auto;
   padding: 10px;
-  background: #1e1e1e;
+  background: #fff;
 `;
 
 const Section = styled.div`
@@ -50,10 +50,11 @@ const Section = styled.div`
 
 const Title = styled.h3`
   margin: 0 0 10px 0;
-  color: #569cd6;
+  color: #000;
   font-size: 14px;
-  border-bottom: 1px solid #333;
+  border-bottom: 3px solid #000;
   padding-bottom: 4px;
+  font-weight: 800;
 `;
 
 const KeyValue = styled.div`
@@ -61,12 +62,13 @@ const KeyValue = styled.div`
   margin-bottom: 4px;
   
   span:first-child {
-    color: #9cdcfe;
+    color: #000;
     min-width: 120px;
+    font-weight: 700;
   }
   
   span:last-child {
-    color: #ce9178;
+    color: #333;
   }
 `;
 

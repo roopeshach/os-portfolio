@@ -3,14 +3,15 @@ import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
 import styled, { useTheme } from 'styled-components';
-import { fs, readdir, path as pathModule, mkdir, writeFile, readFile, exists } from '../system/FileSystem';
+import { fs, readdir, path as pathModule, mkdir, writeFile, readFile } from '../system/FileSystem';
 
 const TerminalContainer = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props => props.theme.colors.background};
+  background: #1a1a2e;
   padding: 5px;
   overflow: hidden;
+  border: 3px solid #000;
 `;
 
 const TerminalApp: React.FC = () => {
@@ -76,6 +77,46 @@ const TerminalApp: React.FC = () => {
     term.writeln('Type "help" for available commands.');
     term.writeln('');
     term.write(prompt());
+
+    term.attachCustomKeyEventHandler((ev: KeyboardEvent) => {
+      const isMod = ev.metaKey || ev.ctrlKey;
+      const key = ev.key.toLowerCase();
+
+      if (isMod && key === 's') {
+        ev.preventDefault();
+        return false;
+      }
+
+      if (isMod && key === 'a') {
+        ev.preventDefault();
+        term.selectAll();
+        return false;
+      }
+
+      if (isMod && key === 'c') {
+        const selection = term.getSelection();
+        if (selection) {
+          ev.preventDefault();
+          void navigator.clipboard?.writeText(selection);
+          return false;
+        }
+      }
+
+      if (isMod && key === 'v') {
+        ev.preventDefault();
+        void navigator.clipboard?.readText().then((text) => {
+          if (!text) return;
+          const left = commandRef.current.slice(0, cursorRef.current);
+          const right = commandRef.current.slice(cursorRef.current);
+          commandRef.current = left + text + right;
+          cursorRef.current += text.length;
+          refreshLine();
+        });
+        return false;
+      }
+
+      return true;
+    });
 
     const refreshLine = () => {
        // Move cursor to start of line (after prompt)
@@ -227,6 +268,12 @@ const TerminalApp: React.FC = () => {
       const parts = parseArgs(cmd.trim());
       const c = parts[0]?.toLowerCase() || '';
       const args = parts.slice(1);
+
+      const statPath = async (p: string) => {
+        return await new Promise<any>((resolve) => {
+          (fs as any).stat(p, (err: any, s: any) => resolve(err ? null : s));
+        });
+      };
       
       try {
         switch (c) {
@@ -245,6 +292,7 @@ const TerminalApp: React.FC = () => {
             break;
           case 'help':
             term.writeln('Available commands: help, clear, echo, ls, cd, pwd, mkdir, touch, rm, cat, neofetch, whoami, github, contact, date, history, cp, mv');
+            term.writeln('Shortcuts: Cmd/Ctrl+C copy selection, Cmd/Ctrl+V paste, Cmd/Ctrl+A select all');
             break;
           case 'clear':
           case 'cls':
@@ -259,13 +307,26 @@ const TerminalApp: React.FC = () => {
           case 'ls':
           case 'dir':
             try {
-              const files = await readdir(currentPathRef.current);
+              const targetPath = args[0] ? pathModule.resolve(currentPathRef.current, args[0]) : currentPathRef.current;
+              const targetStats = await statPath(targetPath);
+
+              if (!targetStats) {
+                term.writeln(`ls: cannot access '${args[0] || currentPathRef.current}': No such file or directory`);
+                break;
+              }
+
+              if (!targetStats.isDirectory()) {
+                term.writeln(pathModule.basename(targetPath));
+                break;
+              }
+
+              const files = await readdir(targetPath);
               // Colorize directories (mock check for now as readdir returns strings)
               // Ideally we check stat for each, but for speed we might skip or do async
               // Let's do a quick stat
               const coloredFiles = await Promise.all(files.map(async f => {
                  try {
-                   const s = await new Promise<any>(r => fs.stat(pathModule.join(currentPathRef.current, f), (e,s) => r(s)));
+                   const s = await new Promise<any>(r => fs.stat(pathModule.join(targetPath, f), (...args: any[]) => r(args[1])));
                    return s?.isDirectory() ? `\x1b[1;34m${f}\x1b[0m` : f;
                  } catch { return f; }
               }));
@@ -281,11 +342,14 @@ const TerminalApp: React.FC = () => {
                currentPathRef.current = pathModule.dirname(currentPathRef.current);
             } else {
                const target = pathModule.resolve(currentPathRef.current, args[0]);
-               const doesExist = await exists(target);
-               if (doesExist) {
+               const stats = await statPath(target);
+               if (!stats) {
+                 term.writeln(`cd: no such file or directory: ${args[0]}`);
+               } else if (stats.isDirectory()) {
                  currentPathRef.current = target;
                } else {
-                 term.writeln(`cd: no such file or directory: ${args[0]}`);
+                 currentPathRef.current = pathModule.dirname(target);
+                 term.writeln(`cd: '${args[0]}' is a file, switched to parent directory.`);
                }
             }
             break;
@@ -294,6 +358,11 @@ const TerminalApp: React.FC = () => {
                term.writeln('mkdir: missing operand');
              } else {
                const target = pathModule.resolve(currentPathRef.current, args[0]);
+               const s = await statPath(target);
+               if (s) {
+                 term.writeln(`mkdir: cannot create directory '${args[0]}': File exists`);
+                 break;
+               }
                await mkdir(target);
              }
              break;
@@ -302,6 +371,11 @@ const TerminalApp: React.FC = () => {
                term.writeln('touch: missing operand');
              } else {
                const target = pathModule.resolve(currentPathRef.current, args[0]);
+               const s = await statPath(target);
+               if (s?.isDirectory()) {
+                 term.writeln(`touch: cannot touch '${args[0]}': Is a directory`);
+                 break;
+               }
                await writeFile(target, '');
              }
              break;
@@ -310,8 +384,7 @@ const TerminalApp: React.FC = () => {
                term.writeln('rm: missing operand');
              } else {
                 const target = pathModule.resolve(currentPathRef.current, args[0]);
-                // @ts-expect-error fs types mismatch
-                fs.unlink(target, (err: any) => {
+               (fs as any).unlink(target, (err: any) => {
                    if (err) term.writeln(`rm: cannot remove '${args[0]}': ${err.message}`);
                 });
              }
@@ -322,6 +395,11 @@ const TerminalApp: React.FC = () => {
              } else {
                const target = pathModule.resolve(currentPathRef.current, args[0]);
                try {
+                 const s = await statPath(target);
+                 if (s?.isDirectory()) {
+                   term.writeln(`cat: ${args[0]}: Is a directory`);
+                   break;
+                 }
                  const content = await readFile(target);
                  term.writeln(content);
                } catch (e) {

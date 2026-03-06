@@ -4,22 +4,22 @@ import { Activity, Cpu, HardDrive, Zap } from 'lucide-react';
 
 const Container = styled.div`
   height: 100%;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  color: #000;
   padding: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 20px;
+  gap: 15px;
 `;
 
 const Card = styled.div`
-  background: ${props => props.theme.colors.windowBackground};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
+  background: #fff;
+  border: 3px solid #000;
   padding: 15px;
   display: flex;
   flex-direction: column;
+  box-shadow: 4px 4px 0 #000;
 `;
 
 const CardHeader = styled.div`
@@ -28,17 +28,17 @@ const CardHeader = styled.div`
   gap: 10px;
   margin-bottom: 15px;
   font-size: 14px;
-  font-weight: 600;
-  color: ${props => props.theme.colors.textSecondary};
+  font-weight: 800;
+  color: #000;
   text-transform: uppercase;
   letter-spacing: 1px;
 `;
 
 const ValueDisplay = styled.div`
   font-size: 32px;
-  font-weight: 300;
+  font-weight: 800;
   font-family: 'Fira Code', monospace;
-  color: ${props => props.theme.colors.accent};
+  color: #000;
   margin-bottom: 5px;
 `;
 
@@ -47,17 +47,17 @@ const Graph = styled.div`
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  border: 3px solid #000;
   padding: 5px;
   overflow: hidden;
 `;
 
 const Bar = styled.div<{ height: number }>`
   flex: 1;
-  background: ${props => props.theme.colors.accent};
+  background: ${props => props.theme.colors.brutalistPink || '#ff6b9d'};
   height: ${props => props.height}%;
-  opacity: 0.6;
+  border: 1px solid #000;
   transition: height 0.2s;
 `;
 

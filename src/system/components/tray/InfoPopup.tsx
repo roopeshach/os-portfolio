@@ -4,18 +4,16 @@ import { Layers, Box, Cpu, Code } from 'lucide-react';
 
 const PopupContainer = styled.div`
   position: absolute;
-  bottom: 60px;
+  bottom: 65px;
   right: 10px;
   width: 300px;
-  background: rgba(10, 15, 30, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 12px;
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 3px solid #000;
   padding: 20px;
-  box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
+  box-shadow: 6px 6px 0 #000;
   z-index: 10000;
-  color: ${props => props.theme.colors.text};
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #000;
+  animation: slideUp 0.15s ease-out;
 
   @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
@@ -26,11 +24,12 @@ const PopupContainer = styled.div`
 const Title = styled.h3`
   margin: 0 0 15px 0;
   font-size: 16px;
-  color: ${props => props.theme.colors.accent};
+  color: #000;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid #000;
   padding-bottom: 10px;
+  font-weight: 800;
 `;
 
 const InfoItem = styled.div`
@@ -39,25 +38,31 @@ const InfoItem = styled.div`
   gap: 12px;
   margin-bottom: 12px;
   font-size: 14px;
+  
+  svg {
+    color: #000;
+  }
 `;
 
 const Label = styled.div`
-  color: ${props => props.theme.colors.textSecondary};
+  color: #333;
   font-size: 12px;
+  font-weight: 600;
 `;
 
 const Value = styled.div`
-  font-weight: 500;
+  font-weight: 800;
+  color: #000;
 `;
 
 const Tag = styled.span`
-  background: rgba(0, 216, 255, 0.1);
-  color: ${props => props.theme.colors.accent};
+  background: ${props => props.theme.colors.brutalistBlue || '#4d96ff'};
+  color: #000;
   padding: 2px 6px;
-  border-radius: 4px;
   font-size: 10px;
   margin-right: 5px;
-  border: 1px solid rgba(0, 216, 255, 0.2);
+  border: 2px solid #000;
+  font-weight: 700;
 `;
 
 const InfoPopup: React.FC = () => {
