@@ -1,12 +1,14 @@
 name: Conventional PR
 
 on:
-  pull_request_target:
-    types: [opened, edited, synchronize, reopened]
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
+  contents: read
   pull-requests: read
 
 jobs:
