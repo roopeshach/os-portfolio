@@ -112,22 +112,25 @@ const StatsGrid = styled(motion.div)`
 `;
 
 const StatCard = styled.div`
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
+  background: ${props => props.theme.colors.brutalistGreen || '#6bcb77'};
+  border-radius: 0;
   padding: 20px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
   
   h3 {
     margin: 0;
     font-size: 24px;
-    color: ${props => props.theme.colors.text};
+    color: #000;
+    font-weight: 900;
   }
   
   p {
     margin: 5px 0 0;
     font-size: 12px;
-    color: ${props => props.theme.colors.textSecondary};
+    color: #000;
+    font-weight: 700;
     text-transform: uppercase;
   }
 `;

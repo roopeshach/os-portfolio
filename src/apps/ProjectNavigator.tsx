@@ -81,11 +81,13 @@ const TagContainer = styled.div`
 `;
 
 const Tag = styled.span`
-  background: rgba(255, 255, 255, 0.05);
+  background: ${props => props.theme.colors.brutalistYellow || '#ffd93d'};
+  border: 2px solid #000;
   padding: 2px 6px;
-  border-radius: 4px;
   font-size: 10px;
-  color: #aaa;
+  color: #000;
+  font-weight: 800;
+  box-shadow: 1px 1px 0 #000;
 `;
 
 interface ProjectData {
@@ -167,7 +169,7 @@ const ProjectNavigator: React.FC = () => {
         <Title>
           <Code size={24} /> Project Sector
         </Title>
-        <div style={{ fontSize: 12, color: '#666' }}>
+        <div style={{ fontSize: 12, color: '#000', fontWeight: 700 }}>
           /Users/Roopesh/Desktop/Projects
         </div>
       </Header>
@@ -200,7 +202,7 @@ const ProjectNavigator: React.FC = () => {
           </ProjectCard>
         ))}
         {projects.length === 0 && (
-          <div style={{ color: '#666', gridColumn: '1/-1', textAlign: 'center' }}>
+          <div style={{ color: '#000', gridColumn: '1/-1', textAlign: 'center', fontWeight: 700 }}>
             No project data modules found.
           </div>
         )}
