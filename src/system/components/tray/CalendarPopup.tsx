@@ -109,7 +109,7 @@ const DayLabel = styled.div`
   margin-bottom: 8px;
 `;
 
-const DateCell = styled.div<{ $isToday?: boolean; $isOtherMonth?: boolean }>`
+const DateCell = styled.div<{ $isToday?: boolean; $isSelected?: boolean; $isOtherMonth?: boolean }>`
   position: relative;
   height: 36px;
   display: flex;
@@ -119,9 +119,13 @@ const DateCell = styled.div<{ $isToday?: boolean; $isOtherMonth?: boolean }>`
   cursor: pointer;
   font-weight: 700;
   color: #000;
-  border: ${props => props.$isToday ? '3px solid #000' : '2px solid transparent'};
-  background: ${props => props.$isToday ? (props.theme.colors.brutalistPink || '#ff6b9d') : 'transparent'};
-  box-shadow: ${props => props.$isToday ? '2px 2px 0 #000' : 'none'};
+  border: ${props => props.$isToday ? '3px solid #000' : props.$isSelected ? '2px solid #000' : '2px solid transparent'};
+  background: ${props => {
+    if (props.$isToday) return props.theme.colors.brutalistOrange || '#ff9f43';
+    if (props.$isSelected) return props.theme.colors.brutalistPink || '#ff6b9d';
+    return 'transparent';
+  }};
+  box-shadow: ${props => props.$isToday || props.$isSelected ? '2px 2px 0 #000' : 'none'};
   opacity: ${props => props.$isOtherMonth ? 0.4 : 1};
   
   &:hover {
@@ -336,21 +340,35 @@ const CalendarPopup: React.FC = () => {
     date: number,
   ) => events.filter((event) => event.month === month && event.date === date);
 
-  const selectedADEvents = useMemo(() => {
-    const dynamicADEvents = adEventsByYear[selectedDate.getFullYear()] ?? [];
-    return mergeEvents(
-      getEventsForMonthDay('AD', selectedDate.getMonth() + 1, selectedDate.getDate()),
-      getDynamicEventsForMonthDay(dynamicADEvents, selectedDate.getMonth() + 1, selectedDate.getDate()),
-    );
-  }, [selectedDate, adEventsByYear]);
+  const getActiveADEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
+    const source = adSourceByYear[year];
+    const dynamic = getDynamicEventsForMonthDay(adEventsByYear[year] ?? [], month, date);
+    if (source === 'api') {
+      return dynamic;
+    }
+    return mergeEvents(getEventsForMonthDay('AD', month, date), dynamic);
+  };
 
-  const selectedBSEvents = useMemo(() => {
-    const dynamicBSEvents = bsEventsByYear[selectedBsDate.getYear()] ?? [];
-    return mergeEvents(
-      getEventsForMonthDay('BS', selectedBsDate.getMonth() + 1, selectedBsDate.getDate()),
-      getDynamicEventsForMonthDay(dynamicBSEvents, selectedBsDate.getMonth() + 1, selectedBsDate.getDate()),
-    );
-  }, [selectedBsDate, bsEventsByYear]);
+  const getActiveBSEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
+    const source = bsSourceByYear[year];
+    const dynamic = getDynamicEventsForMonthDay(bsEventsByYear[year] ?? [], month, date);
+    if (source === 'api') {
+      return dynamic;
+    }
+    return mergeEvents(getEventsForMonthDay('BS', month, date), dynamic);
+  };
+
+  const selectedADEvents = getActiveADEventsForDay(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth() + 1,
+    selectedDate.getDate(),
+  );
+
+  const selectedBSEvents = getActiveBSEventsForDay(
+    selectedBsDate.getYear(),
+    selectedBsDate.getMonth() + 1,
+    selectedBsDate.getDate(),
+  );
 
   const selectedEvents = calendarMode === 'AD' ? selectedADEvents : selectedBSEvents;
 
@@ -374,7 +392,7 @@ const CalendarPopup: React.FC = () => {
     }
   };
 
-  const calendarCells = useMemo<CalendarCell[]>(() => {
+  const calendarCells: CalendarCell[] = (() => {
     const cells: CalendarCell[] = [];
     const today = new Date();
 
@@ -397,10 +415,7 @@ const CalendarPopup: React.FC = () => {
 
       for (let day = 1; day <= daysInMonth; day += 1) {
         const adDate = new Date(year, month, day);
-        const hasEvents = mergeEvents(
-          getEventsForMonthDay('AD', month + 1, day),
-          getDynamicEventsForMonthDay(adEventsByYear[year] ?? [], month + 1, day),
-        ).length > 0;
+        const hasEvents = getActiveADEventsForDay(year, month + 1, day).length > 0;
         cells.push({
           key: `ad-${year}-${month}-${day}`,
           day,
@@ -433,10 +448,7 @@ const CalendarPopup: React.FC = () => {
     for (let day = 1; day <= daysInMonth; day += 1) {
       const bsDate = new NepaliDate(bsYear, bsMonth, day);
       const adDate = bsDate.toJsDate();
-      const hasEvents = mergeEvents(
-        getEventsForMonthDay('BS', bsMonth + 1, day),
-        getDynamicEventsForMonthDay(bsEventsByYear[bsYear] ?? [], bsMonth + 1, day),
-      ).length > 0;
+      const hasEvents = getActiveBSEventsForDay(bsYear, bsMonth + 1, day).length > 0;
       cells.push({
         key: `bs-${bsYear}-${bsMonth}-${day}`,
         day,
@@ -448,7 +460,7 @@ const CalendarPopup: React.FC = () => {
     }
 
     return cells;
-  }, [calendarMode, viewDate, bsViewDate, adEventsByYear, bsEventsByYear]);
+  })();
 
   const dataSourceMessage = useMemo(() => {
     if (isLoadingEvents) {
@@ -563,7 +575,8 @@ const CalendarPopup: React.FC = () => {
           return (
             <DateCell
               key={cell.key}
-              $isToday={cell.isToday || isSelected}
+              $isToday={cell.isToday}
+              $isSelected={isSelected}
               onClick={() => setSelectedDate(cell.adDate)}
             >
               {cell.day}
