@@ -355,7 +355,7 @@ const CalendarPopup: React.FC = () => {
     if (source === 'api') {
       return dynamic;
     }
-    return mergeEvents(getEventsForMonthDay('BS', month, date), dynamic);
+    return [];
   };
 
   const selectedADEvents = getActiveADEventsForDay(
@@ -472,15 +472,15 @@ const CalendarPopup: React.FC = () => {
       const provider = bsProviderByYear[bsViewYear];
       if (source === 'api') {
         if (provider === 'bs-secondary') {
-          return `BS events source: secondary live provider (${bsSecondaryApiSupportedYearRange.min}–${bsSecondaryApiSupportedYearRange.max}) + built-in events.`;
+          return `BS events source: secondary live provider (${bsSecondaryApiSupportedYearRange.min}–${bsSecondaryApiSupportedYearRange.max}).`;
         }
-        return `BS events source: primary live provider (${bsPrimaryApiSupportedYearRange.min}–${bsPrimaryApiSupportedYearRange.max}) + built-in events.`;
+        return `BS events source: primary live provider (${bsPrimaryApiSupportedYearRange.min}–${bsPrimaryApiSupportedYearRange.max}).`;
       }
       if (source === 'unsupported') {
-        return `BS live providers support ${bsCombinedSupportedYearRange.min}–${bsCombinedSupportedYearRange.max}; showing built-in BS events for ${bsViewYear}.`;
+        return `BS live providers support ${bsCombinedSupportedYearRange.min}–${bsCombinedSupportedYearRange.max}; no live BS events for ${bsViewYear}.`;
       }
       if (source === 'error') {
-        return 'BS API unavailable; showing built-in BS events.';
+        return 'BS API unavailable right now.';
       }
       return 'BS events are ready.';
     }
