@@ -13,11 +13,22 @@ export interface CalendarEvent {
 export interface CalendarFetchResult {
   events: CalendarEvent[];
   source: 'api' | 'unsupported' | 'error';
+  provider?: 'bs-primary' | 'bs-secondary' | 'ad-ics';
 }
 
-export const bsApiSupportedYearRange = {
+export const bsPrimaryApiSupportedYearRange = {
   min: 1970,
   max: 2074,
+};
+
+export const bsSecondaryApiSupportedYearRange = {
+  min: 1992,
+  max: 2080,
+};
+
+export const bsCombinedSupportedYearRange = {
+  min: Math.min(bsPrimaryApiSupportedYearRange.min, bsSecondaryApiSupportedYearRange.min),
+  max: Math.max(bsPrimaryApiSupportedYearRange.max, bsSecondaryApiSupportedYearRange.max),
 };
 
 export const englishCalendarEvents: CalendarEvent[] = [
@@ -168,6 +179,29 @@ export const mergeEvents = (...eventSets: CalendarEvent[][]): CalendarEvent[] =>
   return merged;
 };
 
+const nepaliDigitMap: Record<string, string> = {
+  '०': '0',
+  '१': '1',
+  '२': '2',
+  '३': '3',
+  '४': '4',
+  '५': '5',
+  '६': '6',
+  '७': '7',
+  '८': '8',
+  '९': '9',
+};
+
+const parseBsDateValue = (raw: string): number => {
+  const normalized = raw
+    .split('')
+    .map((char) => nepaliDigitMap[char] ?? char)
+    .join('')
+    .replace(/[^0-9]/g, '');
+
+  return Number(normalized);
+};
+
 const trimValue = (value: string): string => {
   return value
     .replace(/\\n/g, ' ')
@@ -202,6 +236,21 @@ interface BsApiDay {
 
 type BsApiResponse = Record<string, BsApiDay[]>;
 
+interface BsSecondaryMonthResponse {
+  metadata?: {
+    en?: string;
+    np?: string;
+  };
+  days?: Array<{
+    n?: string;
+    e?: string;
+    t?: string;
+    f?: string;
+    h?: boolean;
+    d?: number;
+  }>;
+}
+
 const findMonthEntries = (payload: BsApiResponse, monthIndex: number): BsApiDay[] => {
   const aliases = bsMonthAliases[monthIndex] ?? [];
   for (const key of aliases) {
@@ -213,11 +262,7 @@ const findMonthEntries = (payload: BsApiResponse, monthIndex: number): BsApiDay[
   return [];
 };
 
-export const fetchBsCalendarEventsForYear = async (year: number): Promise<CalendarFetchResult> => {
-  if (year < bsApiSupportedYearRange.min || year > bsApiSupportedYearRange.max) {
-    return { events: [], source: 'unsupported' };
-  }
-
+const fetchBsEventsFromPrimaryProvider = async (year: number): Promise<CalendarFetchResult> => {
   try {
     const response = await fetch(`https://bibhuticoder.github.io/nepali-calendar-api/api/${year}.json`);
     if (!response.ok) {
@@ -262,10 +307,97 @@ export const fetchBsCalendarEventsForYear = async (year: number): Promise<Calend
       });
     }
 
-    return { events, source: 'api' };
+    return { events, source: 'api', provider: 'bs-primary' };
   } catch {
     return { events: [], source: 'error' };
   }
+};
+
+const bsSecondaryWeekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+const fetchBsEventsFromSecondaryProvider = async (year: number): Promise<CalendarFetchResult> => {
+  try {
+    const monthRequests = Array.from({ length: 12 }, (_, index) => {
+      const month = index + 1;
+      return fetch(`https://the-value-crew.github.io/nepali-calendar-api/data/${year}/${month}.json`);
+    });
+
+    const monthResponses = await Promise.all(monthRequests);
+    if (monthResponses.some((response) => !response.ok)) {
+      return { events: [], source: 'error' };
+    }
+
+    const payloads = await Promise.all(monthResponses.map((response) => response.json() as Promise<BsSecondaryMonthResponse>));
+    const events: CalendarEvent[] = [];
+
+    payloads.forEach((payload, monthIndex) => {
+      const days = payload.days ?? [];
+
+      days.forEach((day, index) => {
+        const date = parseBsDateValue(day.n ?? '');
+        if (!Number.isFinite(date) || date < 1 || date > 32) {
+          return;
+        }
+
+        const festival = trimValue(day.f ?? '');
+        const tithi = trimValue(day.t ?? '');
+        const isImportant = Boolean(day.h || festival || tithi);
+        if (!isImportant) {
+          return;
+        }
+
+        const title = festival || tithi || 'Important Day';
+        const weekday = typeof day.d === 'number' && day.d >= 1 && day.d <= 7
+          ? bsSecondaryWeekdays[day.d - 1]
+          : '';
+
+        const detailParts = [
+          tithi ? `Tithi: ${tithi}` : '',
+          weekday ? `Weekday: ${weekday}` : '',
+          day.h ? 'Holiday' : '',
+        ].filter(Boolean);
+
+        events.push({
+          id: `bs-secondary-${year}-${monthIndex + 1}-${date}-${index}`,
+          calendar: 'BS',
+          month: monthIndex + 1,
+          date,
+          title,
+          description: detailParts.join(' · '),
+          kind: day.h ? 'holiday' : festival ? 'festival' : 'observance',
+        });
+      });
+    });
+
+    return { events, source: 'api', provider: 'bs-secondary' };
+  } catch {
+    return { events: [], source: 'error' };
+  }
+};
+
+export const fetchBsCalendarEventsForYear = async (year: number): Promise<CalendarFetchResult> => {
+  const inPrimaryRange = year >= bsPrimaryApiSupportedYearRange.min && year <= bsPrimaryApiSupportedYearRange.max;
+  const inSecondaryRange = year >= bsSecondaryApiSupportedYearRange.min && year <= bsSecondaryApiSupportedYearRange.max;
+
+  if (inPrimaryRange) {
+    const primary = await fetchBsEventsFromPrimaryProvider(year);
+    if (primary.source === 'api') {
+      return primary;
+    }
+    if (inSecondaryRange) {
+      const secondaryFallback = await fetchBsEventsFromSecondaryProvider(year);
+      if (secondaryFallback.source === 'api') {
+        return secondaryFallback;
+      }
+    }
+    return primary;
+  }
+
+  if (inSecondaryRange) {
+    return fetchBsEventsFromSecondaryProvider(year);
+  }
+
+  return { events: [], source: 'unsupported' };
 };
 
 const adHolidayFeedUrl = 'https://r.jina.ai/http://www.officeholidays.com/ics/nepal';
@@ -316,7 +448,7 @@ export const fetchAdCalendarEventsForYear = async (year: number): Promise<Calend
 
     const content = await response.text();
     const events = parseIcsEventsForYear(content, year);
-    return { events, source: 'api' };
+    return { events, source: 'api', provider: 'ad-ics' };
   } catch {
     return { events: [], source: 'error' };
   }

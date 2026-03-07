@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import NepaliDate from 'nepali-date-converter';
 import {
-  bsApiSupportedYearRange,
+  bsCombinedSupportedYearRange,
+  bsPrimaryApiSupportedYearRange,
+  bsSecondaryApiSupportedYearRange,
   fetchAdCalendarEventsForYear,
   fetchBsCalendarEventsForYear,
   getEventsForMonthDay,
@@ -128,13 +130,16 @@ const DateCell = styled.div<{ $isToday?: boolean; $isOtherMonth?: boolean }>`
   }
 `;
 
-const EventDot = styled.span`
+const EventDot = styled.span<{ $mode: CalendarType }>`
   position: absolute;
   bottom: 3px;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #000;
+  background: ${props => props.$mode === 'AD'
+    ? (props.theme.colors.brutalistBlue || '#4d96ff')
+    : (props.theme.colors.brutalistPurple || '#a66cff')};
+  border: 1px solid #000;
 `;
 
 const TimeDisplay = styled.div`
@@ -256,7 +261,7 @@ const CalendarPopup: React.FC = () => {
   const [bsEventsByYear, setBsEventsByYear] = useState<Record<number, CalendarEvent[]>>({});
   const [adSourceByYear, setAdSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
   const [bsSourceByYear, setBsSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
-  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [bsProviderByYear, setBsProviderByYear] = useState<Record<number, CalendarFetchResult['provider']>>({});
 
   React.useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -305,15 +310,15 @@ const CalendarPopup: React.FC = () => {
           }
           setBsEventsByYear((previous) => ({ ...previous, [bsViewYear]: result.events }));
           setBsSourceByYear((previous) => ({ ...previous, [bsViewYear]: result.source }));
+          setBsProviderByYear((previous) => ({ ...previous, [bsViewYear]: result.provider }));
         }),
       );
     }
 
     if (pending.length > 0) {
-      setIsLoadingEvents(true);
       Promise.all(pending).finally(() => {
-        if (isMounted) {
-          setIsLoadingEvents(false);
+        if (!isMounted) {
+          return;
         }
       });
     }
@@ -323,8 +328,7 @@ const CalendarPopup: React.FC = () => {
     };
   }, [adViewYear, bsViewYear, adEventsByYear, bsEventsByYear]);
 
-  const dynamicADEvents = adEventsByYear[selectedDate.getFullYear()] ?? [];
-  const dynamicBSEvents = bsEventsByYear[selectedBsDate.getYear()] ?? [];
+  const isLoadingEvents = adEventsByYear[adViewYear] === undefined || bsEventsByYear[bsViewYear] === undefined;
 
   const getDynamicEventsForMonthDay = (
     events: CalendarEvent[],
@@ -333,18 +337,20 @@ const CalendarPopup: React.FC = () => {
   ) => events.filter((event) => event.month === month && event.date === date);
 
   const selectedADEvents = useMemo(() => {
+    const dynamicADEvents = adEventsByYear[selectedDate.getFullYear()] ?? [];
     return mergeEvents(
       getEventsForMonthDay('AD', selectedDate.getMonth() + 1, selectedDate.getDate()),
       getDynamicEventsForMonthDay(dynamicADEvents, selectedDate.getMonth() + 1, selectedDate.getDate()),
     );
-  }, [selectedDate, dynamicADEvents]);
+  }, [selectedDate, adEventsByYear]);
 
   const selectedBSEvents = useMemo(() => {
+    const dynamicBSEvents = bsEventsByYear[selectedBsDate.getYear()] ?? [];
     return mergeEvents(
       getEventsForMonthDay('BS', selectedBsDate.getMonth() + 1, selectedBsDate.getDate()),
       getDynamicEventsForMonthDay(dynamicBSEvents, selectedBsDate.getMonth() + 1, selectedBsDate.getDate()),
     );
-  }, [selectedBsDate, dynamicBSEvents]);
+  }, [selectedBsDate, bsEventsByYear]);
 
   const selectedEvents = calendarMode === 'AD' ? selectedADEvents : selectedBSEvents;
 
@@ -451,11 +457,15 @@ const CalendarPopup: React.FC = () => {
 
     if (calendarMode === 'BS') {
       const source = bsSourceByYear[bsViewYear];
+      const provider = bsProviderByYear[bsViewYear];
       if (source === 'api') {
-        return 'BS events source: nepali-calendar-api + built-in events.';
+        if (provider === 'bs-secondary') {
+          return `BS events source: secondary live provider (${bsSecondaryApiSupportedYearRange.min}–${bsSecondaryApiSupportedYearRange.max}) + built-in events.`;
+        }
+        return `BS events source: primary live provider (${bsPrimaryApiSupportedYearRange.min}–${bsPrimaryApiSupportedYearRange.max}) + built-in events.`;
       }
       if (source === 'unsupported') {
-        return `BS API supports ${bsApiSupportedYearRange.min}–${bsApiSupportedYearRange.max}; showing built-in BS events for ${bsViewYear}.`;
+        return `BS live providers support ${bsCombinedSupportedYearRange.min}–${bsCombinedSupportedYearRange.max}; showing built-in BS events for ${bsViewYear}.`;
       }
       if (source === 'error') {
         return 'BS API unavailable; showing built-in BS events.';
@@ -471,7 +481,15 @@ const CalendarPopup: React.FC = () => {
       return 'AD holiday feed unavailable; showing built-in English events.';
     }
     return 'AD events are ready.';
-  }, [isLoadingEvents, calendarMode, bsSourceByYear, adSourceByYear, bsViewYear, adViewYear]);
+  }, [
+    isLoadingEvents,
+    calendarMode,
+    bsSourceByYear,
+    bsProviderByYear,
+    adSourceByYear,
+    bsViewYear,
+    adViewYear,
+  ]);
 
   const handleMonthChange = (direction: -1 | 1) => {
     if (calendarMode === 'AD') {
@@ -549,7 +567,7 @@ const CalendarPopup: React.FC = () => {
               onClick={() => setSelectedDate(cell.adDate)}
             >
               {cell.day}
-              {cell.hasEvents && <EventDot />}
+              {cell.hasEvents && <EventDot $mode={calendarMode} />}
             </DateCell>
           );
         })}
