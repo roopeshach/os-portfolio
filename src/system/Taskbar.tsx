@@ -135,9 +135,9 @@ const Clock = ({ onClick }: { onClick: () => void }) => {
   }, []);
 
   return (
-    <div onClick={onClick} style={{ textAlign: 'center', lineHeight: '1.2', cursor: 'pointer', padding: '0 8px' }}>
+    <div onClick={onClick} style={{ textAlign: 'center', lineHeight: '1.2', cursor: 'pointer', padding: '0 8px', color: '#000', fontWeight: 700 }}>
       <div>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-      <div style={{ fontSize: 10 }}>{time.toLocaleDateString()}</div>
+      <div style={{ fontSize: 10, color: '#000' }}>{time.toLocaleDateString()}</div>
     </div>
   );
 };

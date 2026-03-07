@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Wifi, Volume2, Battery, Sun, Monitor, Cpu } from 'lucide-react';
+import { Wifi, Volume2, Battery, Sun, Monitor, Cpu, Moon } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../../store';
-import { setVolume, setBrightness } from '../../../store/settingsSlice';
+import { setVolume, setBrightness, setTheme } from '../../../store/settingsSlice';
 import { openProcess } from '../../../store/processSlice';
 
 const PopupContainer = styled.div`
@@ -119,6 +119,7 @@ const QuickSettingsPopup: React.FC = () => {
   const dispatch = useDispatch();
   const volume = useSelector((state: RootState) => state.settings.volume);
   const brightness = useSelector((state: RootState) => state.settings.brightness);
+  const themeMode = useSelector((state: RootState) => state.settings.theme);
 
   const handlePerformance = () => {
     dispatch(openProcess({
@@ -155,6 +156,10 @@ const QuickSettingsPopup: React.FC = () => {
           <Tile onClick={handlePerformance}>
             <Cpu size={20} />
             <TileLabel>Performance</TileLabel>
+          </Tile>
+          <Tile active={themeMode === 'dark'} onClick={() => dispatch(setTheme(themeMode === 'dark' ? 'light' : 'dark'))}>
+            {themeMode === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+            <TileLabel>{themeMode === 'dark' ? 'Dark Mode' : 'Light Mode'}</TileLabel>
           </Tile>
         </Grid>
       </div>

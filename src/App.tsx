@@ -54,6 +54,10 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  useEffect(() => {
+    window.localStorage.setItem('themeMode', themeMode);
+  }, [themeMode]);
+
   if (!fsReady) {
     return (
       <div style={{ background: '#000', color: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI' }}>

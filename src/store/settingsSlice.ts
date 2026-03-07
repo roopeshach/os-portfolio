@@ -8,8 +8,21 @@ export interface SettingsState {
   soundEnabled: boolean;
 }
 
+const resolveInitialTheme = (): 'light' | 'dark' => {
+  if (typeof window === 'undefined') {
+    return 'dark';
+  }
+
+  const savedTheme = window.localStorage.getItem('themeMode');
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    return savedTheme;
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
 const initialState: SettingsState = {
-  theme: 'dark', // Default to dark mode like Win10/11 default
+  theme: resolveInitialTheme(),
   wallpaper: '/assets/wallpapers/cyberpunk.svg',
   volume: 50,
   brightness: 100,
