@@ -130,7 +130,6 @@ const Calculator: React.FC<CalculatorProps> = ({ isActive }) => {
       const keys = Object.keys(context);
       const values = Object.values(context);
       
-      // eslint-disable-next-line no-new-func
       const func = new Function(...keys, 'return ' + expr);
       const result = func(...values);
       

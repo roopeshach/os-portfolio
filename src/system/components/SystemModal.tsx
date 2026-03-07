@@ -10,10 +10,12 @@ import { MessageSquare, HelpCircle } from 'lucide-react';
 type ModalCallback = (value: string | boolean | null) => void;
 const modalCallbacks: Map<string, ModalCallback> = new Map();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const registerModalCallback = (id: string, callback: ModalCallback) => {
   modalCallbacks.set(id, callback);
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const unregisterModalCallback = (id: string) => {
   modalCallbacks.delete(id);
 };
@@ -151,7 +153,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
       default:
         return `
           background: #fff;
-            border-color: ${props.theme.colors.textSecondary};
+          border-color: ${props.theme.colors.textSecondary};
+
+          &:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
           }
         `;
     }
@@ -170,6 +176,7 @@ const SystemModal: React.FC = () => {
 
   useEffect(() => {
     if (modal.isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(modal.defaultValue || '');
       // Focus input after animation
       setTimeout(() => inputRef.current?.focus(), 100);

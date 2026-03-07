@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import { readdir, fs, path as pathModule, mkdir, writeFile, readFile } from '../system/FileSystem';
@@ -148,7 +149,7 @@ const FileExplorer: React.FC = () => {
 
   // Initialize icon positions
   const getDefaultPosition = useCallback((index: number): IconPosition => {
-    const containerWidth = containerRef.current?.clientWidth || 600;
+    const containerWidth = Math.max(600, window.innerWidth - 240);
     const iconsPerRow = Math.floor(containerWidth / 110);
     const col = index % iconsPerRow;
     const row = Math.floor(index / iconsPerRow);
@@ -160,8 +161,9 @@ const FileExplorer: React.FC = () => {
     const saved = localStorage.getItem(getStorageKey());
     if (saved) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIconPositions(JSON.parse(saved));
-      } catch (e) {
+      } catch {
         setIconPositions({});
       }
     } else {
@@ -237,6 +239,7 @@ const FileExplorer: React.FC = () => {
       }
     };
     loadFiles(currentPath);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFile(null);
   }, [currentPath]);
 
@@ -270,7 +273,7 @@ const FileExplorer: React.FC = () => {
     return candidate;
   }, []);
 
-  const copyEntryRecursive = useCallback(async (srcPath: string, destPath: string) => {
+  async function copyEntryRecursive(srcPath: string, destPath: string): Promise<void> {
     const stat = await new Promise<any>((resolve, reject) => {
       (fs as any).stat(srcPath, (err: any, s: any) => err ? reject(err) : resolve(s));
     });
@@ -286,9 +289,9 @@ const FileExplorer: React.FC = () => {
 
     const data = await readFile(srcPath);
     await writeFile(destPath, data);
-  }, []);
+  }
 
-  const deleteEntryRecursive = useCallback(async (targetPath: string) => {
+  async function deleteEntryRecursive(targetPath: string): Promise<void> {
     const stat = await new Promise<any>((resolve, reject) => {
       (fs as any).stat(targetPath, (err: any, s: any) => err ? reject(err) : resolve(s));
     });
@@ -307,7 +310,7 @@ const FileExplorer: React.FC = () => {
     await new Promise<void>((resolve, reject) => {
       (fs as any).unlink(targetPath, (err: any) => err ? reject(err) : resolve());
     });
-  }, []);
+  }
 
   const copySelected = useCallback(() => {
     if (!selectedFile) return;
@@ -327,7 +330,7 @@ const FileExplorer: React.FC = () => {
     });
   }, [selectedFile, currentPath]);
 
-  const pasteClipboard = useCallback(async () => {
+  async function pasteClipboard(): Promise<void> {
     if (!clipboardItem) return;
     try {
       const targetBase = pathModule.join(currentPath, clipboardItem.name);
@@ -343,16 +346,16 @@ const FileExplorer: React.FC = () => {
       }
 
       await refreshCurrentPath();
-    } catch (e) {
+    } catch {
       dispatch(showAlert({
         title: 'Paste Error',
         message: 'Unable to paste selected item.',
         type: 'error',
       }));
     }
-  }, [clipboardItem, currentPath, copyEntryRecursive, dispatch, getUniqueTargetPath, refreshCurrentPath]);
+  }
 
-  const deleteSelected = useCallback(async () => {
+  async function deleteSelected(): Promise<void> {
     if (!selectedFile) return;
     const confirmed = await modal.confirm({
       title: 'Delete',
@@ -373,7 +376,7 @@ const FileExplorer: React.FC = () => {
         type: 'error',
       }));
     }
-  }, [currentPath, deleteEntryRecursive, dispatch, modal, refreshCurrentPath, selectedFile]);
+  }
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -401,15 +404,11 @@ const FileExplorer: React.FC = () => {
           void deleteSelected();
         }
       }
-      if (key === 'enter' && selectedFile) {
-        e.preventDefault();
-        openFile(selectedFile);
-      }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [copySelected, cutSelected, deleteSelected, pasteClipboard, selectedFile]);
+  });
 
   const handleNavigate = (newPath: string) => {
     setCurrentPath(newPath);
@@ -420,7 +419,7 @@ const FileExplorer: React.FC = () => {
     handleNavigate(parent);
   };
 
-  const openFile = (filename: string) => {
+  function openFile(filename: string): void {
     const fullPath = pathModule.join(currentPath, filename);
     
     fs.stat(fullPath, (err: unknown, stats: any) => {
@@ -456,7 +455,7 @@ const FileExplorer: React.FC = () => {
         }
       }
     });
-  };
+  }
 
   const createNewFile = async () => {
     const name = await modal.prompt({

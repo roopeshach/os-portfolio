@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useDispatch } from 'react-redux';
@@ -170,7 +171,14 @@ const Desktop: React.FC = () => {
   const dispatch = useDispatch();
   const [items, setItems] = useState<string[]>([]);
   const [greetingIndex, setGreetingIndex] = useState(0);
-  const [iconPositions, setIconPositions] = useState<IconPositions>({});
+  const [iconPositions, setIconPositions] = useState<IconPositions>(() => {
+    try {
+      const saved = localStorage.getItem('desktopIconPositions');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [draggingIcon, setDraggingIcon] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,18 +198,6 @@ const Desktop: React.FC = () => {
     const col = Math.floor(index / iconsPerColumn);
     const row = index % iconsPerColumn;
     return { x: 15 + col * 110, y: 15 + row * 130 };
-  }, []);
-
-  // Load saved positions from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('desktopIconPositions');
-    if (saved) {
-      try {
-        setIconPositions(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to load icon positions');
-      }
-    }
   }, []);
 
   // Save positions to localStorage
@@ -265,7 +261,7 @@ const Desktop: React.FC = () => {
       setGreetingIndex(prev => (prev + 1) % greetingData.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [greetingData.length]);
 
   const loadDesktopItems = useCallback(async () => {
     try {

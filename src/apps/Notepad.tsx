@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { readFile, writeFile } from '../system/FileSystem';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -109,7 +109,7 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
     }
   }, [path]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     let targetPath = currentPath;
     if (!targetPath) {
       const newPath = await modal.prompt({
@@ -135,7 +135,7 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
       console.error(e);
       setStatus('Error saving');
     }
-  };
+  }, [content, currentPath, modal]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -157,7 +157,7 @@ const Notepad: React.FC<NotepadProps> = ({ path }) => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('app:save', onAppSave as EventListener);
     };
-  }, [content, currentPath]);
+  }, [content, currentPath, handleSave]);
 
   return (
     <Container>

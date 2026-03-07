@@ -90,7 +90,7 @@ const FireWallpaper: React.FC = () => {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'cross':
+        case 'cross': {
           const thickness = s / 3;
           ctx.beginPath();
           ctx.rect(-thickness/2, -s/2, thickness, s);
@@ -99,6 +99,7 @@ const FireWallpaper: React.FC = () => {
           ctx.strokeRect(-thickness/2, -s/2, thickness, s);
           ctx.strokeRect(-s/2, -thickness/2, s, thickness);
           break;
+        }
       }
       
       ctx.restore();

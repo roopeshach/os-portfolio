@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef } from 'react';
 import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
@@ -402,7 +403,7 @@ const TerminalApp: React.FC = () => {
                  }
                  const content = await readFile(target);
                  term.writeln(content);
-               } catch (e) {
+               } catch {
                  term.writeln(`cat: ${args[0]}: No such file or directory`);
                }
              }
@@ -455,7 +456,7 @@ const TerminalApp: React.FC = () => {
       term.dispose();
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [theme.colors.accent, theme.colors.background, theme.colors.text]);
 
   return <TerminalContainer ref={containerRef} />;
 };

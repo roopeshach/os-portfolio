@@ -94,7 +94,7 @@ const JSConsole: React.FC = () => {
     
     // Create a sandbox-like environment
     // We override console.log within the scope of execution
-    const captureLog = (type: 'log' | 'error' | 'warn', ...args: any[]) => {
+    const captureLog = (type: 'log' | 'error' | 'warn', ...args: unknown[]) => {
       setLogs(prev => [...prev, { 
         type, 
         content: args.map(a => 

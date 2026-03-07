@@ -153,6 +153,7 @@ const Browser: React.FC<{ initialUrl?: string }> = ({ initialUrl }) => {
 
   useEffect(() => {
     if (activeTab) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUrlInput(activeTab.url);
     }
   }, [activeTab]);

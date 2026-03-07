@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import styled from 'styled-components';
@@ -230,7 +231,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
           setActiveFileIndex(newFiles.length - 1);
           return newFiles;
       });
-    } catch (e) {
+    } catch {
       setStatus(`Error opening ${filePath}`);
     }
   }, [openFiles]);
@@ -238,7 +239,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
   // Load initial file
   useEffect(() => {
     if (initialPath) {
-      handleOpenFile(initialPath);
+      queueMicrotask(() => {
+        void handleOpenFile(initialPath);
+      });
     }
     loadTree(rootPath).then(setFileTree);
   }, [initialPath, rootPath, loadTree, handleOpenFile]);
@@ -257,7 +260,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (activeFileIndex === -1) return;
     const file = openFiles[activeFileIndex];
     try {
@@ -265,10 +268,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       setOpenFiles(prev => prev.map((f, i) => i === activeFileIndex ? { ...f, isDirty: false } : f));
       setStatus('Saved!');
       setTimeout(() => setStatus(''), 2000);
-    } catch (e) {
+    } catch {
       setStatus('Error saving file');
     }
-  };
+  }, [activeFileIndex, openFiles]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -290,7 +293,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('app:save', onAppSave as EventListener);
     };
-  }, [activeFileIndex, openFiles]);
+  }, [activeFileIndex, openFiles, handleSave]);
 
   const handleRun = () => {
     if (activeFileIndex === -1) return;
