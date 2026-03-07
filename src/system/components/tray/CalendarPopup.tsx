@@ -6,10 +6,8 @@ import {
   bsCombinedSupportedYearRange,
   bsPrimaryApiSupportedYearRange,
   bsSecondaryApiSupportedYearRange,
-  fetchAdCalendarEventsForYear,
   fetchBsCalendarEventsForYear,
   getEventsForMonthDay,
-  mergeEvents,
   type CalendarEvent,
   type CalendarFetchResult,
   type CalendarType,
@@ -261,9 +259,7 @@ const CalendarPopup: React.FC = () => {
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
-  const [adEventsByYear, setAdEventsByYear] = useState<Record<number, CalendarEvent[]>>({});
   const [bsEventsByYear, setBsEventsByYear] = useState<Record<number, CalendarEvent[]>>({});
-  const [adSourceByYear, setAdSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
   const [bsSourceByYear, setBsSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
   const [bsProviderByYear, setBsProviderByYear] = useState<Record<number, CalendarFetchResult['provider']>>({});
 
@@ -280,7 +276,6 @@ const CalendarPopup: React.FC = () => {
   );
 
   const bsViewDate = useMemo(() => new NepaliDate(viewDate), [viewDate]);
-  const adViewYear = viewDate.getFullYear();
   const bsViewYear = bsViewDate.getYear();
 
   const bsMonthLabel = useMemo(
@@ -293,18 +288,6 @@ const CalendarPopup: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
     const pending: Promise<void>[] = [];
-
-    if (adEventsByYear[adViewYear] === undefined) {
-      pending.push(
-        fetchAdCalendarEventsForYear(adViewYear).then((result) => {
-          if (!isMounted) {
-            return;
-          }
-          setAdEventsByYear((previous) => ({ ...previous, [adViewYear]: result.events }));
-          setAdSourceByYear((previous) => ({ ...previous, [adViewYear]: result.source }));
-        }),
-      );
-    }
 
     if (bsEventsByYear[bsViewYear] === undefined) {
       pending.push(
@@ -330,9 +313,9 @@ const CalendarPopup: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [adViewYear, bsViewYear, adEventsByYear, bsEventsByYear]);
+  }, [bsViewYear, bsEventsByYear]);
 
-  const isLoadingEvents = adEventsByYear[adViewYear] === undefined || bsEventsByYear[bsViewYear] === undefined;
+  const isLoadingEvents = bsEventsByYear[bsViewYear] === undefined;
 
   const getDynamicEventsForMonthDay = (
     events: CalendarEvent[],
@@ -341,12 +324,9 @@ const CalendarPopup: React.FC = () => {
   ) => events.filter((event) => event.month === month && event.date === date);
 
   const getActiveADEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
-    const source = adSourceByYear[year];
-    const dynamic = getDynamicEventsForMonthDay(adEventsByYear[year] ?? [], month, date);
-    if (source === 'api') {
-      return dynamic;
-    }
-    return mergeEvents(getEventsForMonthDay('AD', month, date), dynamic);
+    const _year = year;
+    void _year;
+    return getEventsForMonthDay('AD', month, date);
   };
 
   const getActiveBSEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
@@ -485,22 +465,13 @@ const CalendarPopup: React.FC = () => {
       return 'BS events are ready.';
     }
 
-    const source = adSourceByYear[adViewYear];
-    if (source === 'api') {
-      return 'AD events source: Nepal holiday feed + built-in English events.';
-    }
-    if (source === 'error') {
-      return 'AD holiday feed unavailable; showing built-in English events.';
-    }
-    return 'AD events are ready.';
+    return 'AD events source: built-in English calendar events.';
   }, [
     isLoadingEvents,
     calendarMode,
     bsSourceByYear,
     bsProviderByYear,
-    adSourceByYear,
     bsViewYear,
-    adViewYear,
   ]);
 
   const handleMonthChange = (direction: -1 | 1) => {
