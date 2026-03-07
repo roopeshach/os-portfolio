@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import NepaliDate from 'nepali-date-converter';
@@ -6,8 +6,8 @@ import {
   bsCombinedSupportedYearRange,
   bsPrimaryApiSupportedYearRange,
   bsSecondaryApiSupportedYearRange,
+  fetchAdCalendarEventsForYear,
   fetchBsCalendarEventsForYear,
-  getEventsForMonthDay,
   type CalendarEvent,
   type CalendarFetchResult,
   type CalendarType,
@@ -259,9 +259,13 @@ const CalendarPopup: React.FC = () => {
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
+  const [adEventsByYear, setAdEventsByYear] = useState<Record<number, CalendarEvent[]>>({});
+  const [adSourceByYear, setAdSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
   const [bsEventsByYear, setBsEventsByYear] = useState<Record<number, CalendarEvent[]>>({});
   const [bsSourceByYear, setBsSourceByYear] = useState<Record<number, CalendarFetchResult['source']>>({});
   const [bsProviderByYear, setBsProviderByYear] = useState<Record<number, CalendarFetchResult['provider']>>({});
+  const requestedADYearsRef = useRef<Set<number>>(new Set());
+  const requestedBSYearsRef = useRef<Set<number>>(new Set());
 
   React.useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -276,6 +280,7 @@ const CalendarPopup: React.FC = () => {
   );
 
   const bsViewDate = useMemo(() => new NepaliDate(viewDate), [viewDate]);
+  const adViewYear = viewDate.getFullYear();
   const bsViewYear = bsViewDate.getYear();
 
   const bsMonthLabel = useMemo(
@@ -287,35 +292,47 @@ const CalendarPopup: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const pending: Promise<void>[] = [];
-
-    if (bsEventsByYear[bsViewYear] === undefined) {
-      pending.push(
-        fetchBsCalendarEventsForYear(bsViewYear).then((result) => {
-          if (!isMounted) {
-            return;
-          }
-          setBsEventsByYear((previous) => ({ ...previous, [bsViewYear]: result.events }));
-          setBsSourceByYear((previous) => ({ ...previous, [bsViewYear]: result.source }));
-          setBsProviderByYear((previous) => ({ ...previous, [bsViewYear]: result.provider }));
-        }),
-      );
-    }
-
-    if (pending.length > 0) {
-      Promise.all(pending).finally(() => {
+    if (!requestedADYearsRef.current.has(adViewYear)) {
+      requestedADYearsRef.current.add(adViewYear);
+      fetchAdCalendarEventsForYear(adViewYear).then((result) => {
         if (!isMounted) {
           return;
         }
+        setAdEventsByYear((previous) => (previous[adViewYear] === undefined
+          ? { ...previous, [adViewYear]: result.events }
+          : previous));
+        setAdSourceByYear((previous) => (previous[adViewYear] === undefined
+          ? { ...previous, [adViewYear]: result.source }
+          : previous));
+      });
+    }
+
+    if (!requestedBSYearsRef.current.has(bsViewYear)) {
+      requestedBSYearsRef.current.add(bsViewYear);
+      fetchBsCalendarEventsForYear(bsViewYear).then((result) => {
+        if (!isMounted) {
+          return;
+        }
+        setBsEventsByYear((previous) => (previous[bsViewYear] === undefined
+          ? { ...previous, [bsViewYear]: result.events }
+          : previous));
+        setBsSourceByYear((previous) => (previous[bsViewYear] === undefined
+          ? { ...previous, [bsViewYear]: result.source }
+          : previous));
+        setBsProviderByYear((previous) => (previous[bsViewYear] === undefined
+          ? { ...previous, [bsViewYear]: result.provider }
+          : previous));
       });
     }
 
     return () => {
       isMounted = false;
     };
-  }, [bsViewYear, bsEventsByYear]);
+  }, [adViewYear, bsViewYear]);
 
-  const isLoadingEvents = bsEventsByYear[bsViewYear] === undefined;
+  const isLoadingEvents = calendarMode === 'AD'
+    ? adEventsByYear[adViewYear] === undefined
+    : bsEventsByYear[bsViewYear] === undefined;
 
   const getDynamicEventsForMonthDay = (
     events: CalendarEvent[],
@@ -324,9 +341,12 @@ const CalendarPopup: React.FC = () => {
   ) => events.filter((event) => event.month === month && event.date === date);
 
   const getActiveADEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
-    const _year = year;
-    void _year;
-    return getEventsForMonthDay('AD', month, date);
+    const source = adSourceByYear[year];
+    const dynamic = getDynamicEventsForMonthDay(adEventsByYear[year] ?? [], month, date);
+    if (source === 'api') {
+      return dynamic;
+    }
+    return [];
   };
 
   const getActiveBSEventsForDay = (year: number, month: number, date: number): CalendarEvent[] => {
@@ -465,12 +485,21 @@ const CalendarPopup: React.FC = () => {
       return 'BS events are ready.';
     }
 
-    return 'AD events source: built-in English calendar events.';
+    const adSource = adSourceByYear[adViewYear];
+    if (adSource === 'api') {
+      return 'AD events source: API-based Gregorian holiday feed.';
+    }
+    if (adSource === 'error') {
+      return 'AD events API unavailable right now.';
+    }
+    return 'AD events are ready.';
   }, [
     isLoadingEvents,
     calendarMode,
+    adSourceByYear,
     bsSourceByYear,
     bsProviderByYear,
+    adViewYear,
     bsViewYear,
   ]);
 
