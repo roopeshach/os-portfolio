@@ -31,14 +31,14 @@ export const AppRegistry: Record<string, React.ComponentType<any>> = {
 };
 
 export const AppMetadata = {
-  'File Explorer': { title: 'File Explorer', icon: '/assets/icons/folder.svg' },
-  'Browser': { title: 'Browser', icon: '/assets/icons/edge.svg' },
-  'VS Code': { title: 'Code Editor', icon: '/assets/icons/vscode.svg' },
-  'Notepad': { title: 'Notepad', icon: '/assets/icons/notepad.svg' },
-  'Calculator': { title: 'Calculator', icon: '/assets/icons/calculator.svg' },
-  'Terminal': { title: 'Terminal', icon: '/assets/icons/terminal.svg' },
-  'Media Player': { title: 'Media Player', icon: '/assets/icons/media-player.svg' },
-  'JS Console': { title: 'JS Console', icon: '/assets/icons/terminal.svg' },
-  'Project Navigator': { title: 'Projects', icon: '/assets/icons/folder.svg' },
-  'DevTools': { title: 'DevTools', icon: '/assets/icons/terminal.svg' }, // Reusing terminal icon for now
+  'File Explorer': { title: 'File Explorer', icon: 'assets/icons/folder.svg' },
+  'Browser': { title: 'Browser', icon: 'assets/icons/edge.svg' },
+  'VS Code': { title: 'Code Editor', icon: 'assets/icons/vscode.svg' },
+  'Notepad': { title: 'Notepad', icon: 'assets/icons/notepad.svg' },
+  'Calculator': { title: 'Calculator', icon: 'assets/icons/calculator.svg' },
+  'Terminal': { title: 'Terminal', icon: 'assets/icons/terminal.svg' },
+  'Media Player': { title: 'Media Player', icon: 'assets/icons/media-player.svg' },
+  'JS Console': { title: 'JS Console', icon: 'assets/icons/terminal.svg' },
+  'Project Navigator': { title: 'Projects', icon: 'assets/icons/folder.svg' },
+  'DevTools': { title: 'DevTools', icon: 'assets/icons/terminal.svg' }, // Reusing terminal icon for now
 };

@@ -155,7 +155,7 @@ const ProjectNavigator: React.FC = () => {
     dispatch(openProcess({
       appId: 'Project Viewer',
       title: projectName,
-      icon: '/assets/icons/folder.svg',
+      icon: 'assets/icons/folder.svg',
       componentName: 'Project Viewer',
       initialProps: { path: `/Users/Roopesh/Desktop/Projects/${projectName}.project` }
     }));

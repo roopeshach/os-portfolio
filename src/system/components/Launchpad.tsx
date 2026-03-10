@@ -99,7 +99,7 @@ const Launchpad: React.FC<LaunchpadProps> = ({ onClose }) => {
     dispatch(openProcess({
       appId: appName,
       title: meta?.title || appName,
-      icon: meta?.icon || '/assets/icons/default.svg',
+      icon: meta?.icon || 'assets/icons/default.svg',
       componentName: appName
     }));
     onClose();
@@ -134,7 +134,7 @@ const Launchpad: React.FC<LaunchpadProps> = ({ onClose }) => {
                  whileHover={{ scale: 1.05 }}
                  whileTap={{ scale: 0.95 }}
                >
-                 <img src={meta?.icon || '/assets/icons/default.svg'} alt={app} onError={(e) => e.currentTarget.style.display = 'none'} />
+                <img src={meta?.icon || 'assets/icons/default.svg'} alt={app} onError={(e) => e.currentTarget.style.display = 'none'} />
                  <span>{meta?.title || app}</span>
                </AppIcon>
              );

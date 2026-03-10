@@ -291,7 +291,7 @@ const Desktop: React.FC = () => {
       dispatch(openProcess({
         appId: 'Project Navigator',
         title: 'Project Navigator',
-        icon: '/assets/icons/folder.svg',
+        icon: 'assets/icons/folder.svg',
         componentName: 'Project Navigator',
       }));
       return;
@@ -303,7 +303,7 @@ const Desktop: React.FC = () => {
           dispatch(openProcess({
             appId: 'File Explorer',
             title: filename,
-            icon: '/assets/icons/folder.svg',
+            icon: 'assets/icons/folder.svg',
             componentName: 'File Explorer',
             initialProps: { path: fullPath }
           }));
@@ -316,7 +316,7 @@ const Desktop: React.FC = () => {
                  dispatch(openProcess({
                    appId: 'Browser',
                    title: filename.replace('.link', ''),
-                   icon: '/assets/icons/edge.svg',
+                  icon: 'assets/icons/edge.svg',
                    componentName: 'Browser',
                    initialProps: { initialUrl: data.trim() }
                  }));
@@ -326,7 +326,7 @@ const Desktop: React.FC = () => {
             dispatch(openProcess({
               appId: 'Project Viewer',
               title: filename.replace('.project', ''),
-              icon: '/assets/icons/folder.svg',
+              icon: 'assets/icons/folder.svg',
               componentName: 'Project Viewer',
               initialProps: { path: fullPath }
             }));
@@ -334,7 +334,7 @@ const Desktop: React.FC = () => {
             dispatch(openProcess({
               appId: 'VS Code',
               title: filename,
-              icon: '/assets/icons/vscode.svg',
+              icon: 'assets/icons/vscode.svg',
               componentName: 'VS Code',
               initialProps: { path: fullPath }
             }));
@@ -379,7 +379,7 @@ const Desktop: React.FC = () => {
           $isDragging={draggingIcon === 'terminal'}
           data-icon="terminal"
           onMouseDown={(e) => handleMouseDown(e, 'terminal')}
-          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: '/assets/icons/terminal.svg', componentName: 'Terminal' }))}
+          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'Terminal', title: 'Terminal', icon: 'assets/icons/terminal.svg', componentName: 'Terminal' }))}
         >
           <Terminal size={40} color="#000" />
           <IconLabel>Terminal</IconLabel>
@@ -391,7 +391,7 @@ const Desktop: React.FC = () => {
           $isDragging={draggingIcon === 'fileexplorer'}
           data-icon="fileexplorer"
           onMouseDown={(e) => handleMouseDown(e, 'fileexplorer')}
-          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: '/assets/icons/folder.svg', componentName: 'File Explorer' }))}
+          onDoubleClick={() => !draggingIcon && dispatch(openProcess({ appId: 'File Explorer', title: 'File Explorer', icon: 'assets/icons/folder.svg', componentName: 'File Explorer' }))}
         >
            <Folder size={40} color="#000" />
            <IconLabel>This PC</IconLabel>

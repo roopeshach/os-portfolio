@@ -433,7 +433,7 @@ const FileExplorer: React.FC = () => {
             dispatch(openProcess({
               appId: 'Project Viewer',
               title: filename.replace('.project', ''),
-              icon: '/assets/icons/folder.svg',
+              icon: 'assets/icons/folder.svg',
               componentName: 'Project Viewer',
               initialProps: { path: fullPath }
             }));
@@ -441,7 +441,7 @@ const FileExplorer: React.FC = () => {
              dispatch(openProcess({
                appId: 'Notepad',
                title: filename,
-               icon: '/assets/icons/notepad.svg',
+               icon: 'assets/icons/notepad.svg',
                componentName: 'Notepad',
                initialProps: { path: fullPath }
              }));
