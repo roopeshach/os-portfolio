@@ -147,7 +147,7 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
       dispatch(openProcess({
         appId: 'VS Code',
         title: pathModule.basename(context.targetFile),
-        icon: '/assets/icons/vscode.svg',
+        icon: 'assets/icons/vscode.svg',
         componentName: 'VS Code',
         initialProps: { path: context.targetFile } // Assuming CodeEditor accepts path
       }));
@@ -155,7 +155,7 @@ export const ContextMenuProvider: React.FC<{ children: React.ReactNode }> = ({ c
        dispatch(openProcess({
         appId: 'VS Code',
         title: 'VS Code',
-        icon: '/assets/icons/vscode.svg',
+        icon: 'assets/icons/vscode.svg',
         componentName: 'VS Code',
         initialProps: { path: context.targetPath }
       }));

@@ -125,7 +125,7 @@ const QuickSettingsPopup: React.FC = () => {
     dispatch(openProcess({
       appId: 'Performance',
       title: 'Performance Monitor',
-      icon: '/assets/icons/task-manager.svg',
+      icon: 'assets/icons/task-manager.svg',
       componentName: 'Performance',
     }));
   };
@@ -134,7 +134,7 @@ const QuickSettingsPopup: React.FC = () => {
     dispatch(openProcess({
       appId: 'Project Navigator',
       title: 'Project Navigator',
-      icon: '/assets/icons/folder.svg',
+      icon: 'assets/icons/folder.svg',
       componentName: 'Project Navigator',
     }));
   };

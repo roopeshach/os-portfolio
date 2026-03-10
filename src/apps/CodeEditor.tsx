@@ -305,7 +305,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       dispatch(openProcess({
         appId: 'Browser',
         title: 'Preview',
-        icon: '/assets/icons/edge.svg',
+        icon: 'assets/icons/edge.svg',
         componentName: 'Browser',
         initialProps: { initialUrl: url }
       }));
@@ -316,7 +316,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ path: initialPath }) => {
       dispatch(openProcess({
         appId: 'Browser',
         title: 'JS Runner',
-        icon: '/assets/icons/edge.svg',
+        icon: 'assets/icons/edge.svg',
         componentName: 'Browser',
         initialProps: { initialUrl: url }
       }));
